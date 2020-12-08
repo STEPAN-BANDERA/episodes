@@ -17,18 +17,26 @@ Widget::~Widget()
 void Widget::on_pushButton_clicked()
 {
     /*
-    430622
+    430622 
     536964
     454905
     269705
     729512
     676306
+    
+    ub
+    bb
+    iy
+    rl
+    tp
+    i
     */
     std::size_t dialogReturnedValue = 0;
     Dialog d(this);
     dialogReturnedValue = d.exec();
     if(dialogReturnedValue == QDialog::Rejected) return;
     QString text2 = d.getText();
+    qDebug((text2.toStdString()).c_str());
     std::string text = text2.toUtf8().constData();
     std::vector <std::string> idVector;
     std::size_t pos;
@@ -38,10 +46,10 @@ void Widget::on_pushButton_clicked()
     idVector.push_back(token);
   }
     if ("" != text ) idVector.push_back(text);
-    std::vector<std::vector<std::pair<std::string,std::size_t>>> allUsersTitles;
+    std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
     for(const auto & e : idVector)
     {
-        std::vector <std::pair<std::string,std::size_t>> titles;
+        std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> titles;
         QNetworkAccessManager manager;
         QNetworkRequest request(QUrl(std::string ("https://yummyanime.club/users/id" + e + "?tab=watched" ).c_str()));
         QNetworkReply *reply(manager.get(request));
@@ -106,7 +114,7 @@ void Widget::on_pushButton_clicked()
                 g[1] = str[pos_start + 20];
                 g[2] = str[pos_start + 21];
                 _size  += std::atoi(g.c_str());
-                titles.push_back(std::make_pair(sub_str,std::atoi(g.c_str())));
+                titles.push_back(std::make_pair(sub_str,std::make_pair(std::atoi(g.c_str()),0)));
             }
             else if (std::isdigit(str[pos_start + 20]))
             {
@@ -114,14 +122,14 @@ void Widget::on_pushButton_clicked()
                 g[0] = str[pos_start + 19];
                 g[1] = str[pos_start + 20];
                 _size  += std::atoi(g.c_str());
-                titles.push_back(std::make_pair(sub_str,std::atoi(g.c_str())));
+                titles.push_back(std::make_pair(sub_str,std::make_pair(std::atoi(g.c_str()),0)));
             }
             else 
             {
                 std::string g = " ";
                 g[0] = str[pos_start + 19];
                 _size  += std::atoi(g.c_str());
-                titles.push_back(std::make_pair(sub_str,std::atoi(g.c_str())));
+                titles.push_back(std::make_pair(sub_str,std::make_pair(std::atoi(g.c_str()),0)));
             }
         }
         allUsersTitles.push_back(titles);
@@ -130,7 +138,8 @@ void Widget::on_pushButton_clicked()
     for(const auto & e: idVector) lst << QString::fromStdString(e) << QString::fromStdString(std::string("тайтл")) << QString::fromStdString(std::string("серии")) << QString::fromStdString(std::string("время в минутах")) << QString::fromStdString(std::string("время в часах")) << QString::fromStdString(std::string("время в сутках"));
     this->ui->tableWidget->setColumnCount(lst.size()*6);
     this->ui->tableWidget->setHorizontalHeaderLabels(lst);
-    std::sort(allUsersTitles.begin(),allUsersTitles.end());
+    //std::sort(allUsersTitles.begin(),allUsersTitles.end());
+    
     for (std::size_t index = 0; index < allUsersTitles.size(); index++ )
     {
     userInfo info;
@@ -142,38 +151,48 @@ void Widget::on_pushButton_clicked()
             {
                 for (std::size_t inner_index_ = 0; inner_index_ < allUsersTitles[index_].size(); inner_index_++ )
                 {
-                    if(allUsersTitles[index][inner_index] == allUsersTitles[index_][inner_index_]) 
+                    if( std::get<0>(allUsersTitles[index][inner_index]) == std::get<0>(allUsersTitles[index_][inner_index_])) 
                     {
                         b = true;
-                        innerFoundIndex = inner_index_;
+                        innerFoundIndex = std::get<1>(std::get<1>(allUsersTitles[index_][inner_index_]));
                         goto skip;
                     }
                 }
             }
             skip:
+            
+            
+            
             if(false == b)
             {
                 this->ui->tableWidget->insertRow(this->ui->tableWidget->rowCount());
-                this->ui->tableWidget->setItem(this->ui->tableWidget->rowCount() - 1, 6*index + 1,new QTableWidgetItem( std::get<0>( allUsersTitles[index][inner_index] ).c_str()              ));
-                this->ui->tableWidget->setItem(this->ui->tableWidget->rowCount() - 1, 6*index + 2,new QTableWidgetItem( QString::number( std::get<1>( allUsersTitles[index][inner_index] )    )));
-                this->ui->tableWidget->setItem(this->ui->tableWidget->rowCount() - 1, 6*index + 3,new QTableWidgetItem( QString::number( std::get<1>( allUsersTitles[index][inner_index] )*20 )));
-                this->ui->tableWidget->setItem(this->ui->tableWidget->rowCount() - 1, 6*index + 4,new QTableWidgetItem( QString::number( std::get<1>( allUsersTitles[index][inner_index] )/3. )));
-                this->ui->tableWidget->setItem(this->ui->tableWidget->rowCount() - 1, 6*index + 5,new QTableWidgetItem( QString::number( std::get<1>( allUsersTitles[index][inner_index] )/72.)));
+                this->ui->tableWidget->setItem  (this->ui->tableWidget->rowCount() - 1, 6*index + 1,new QTableWidgetItem(                               std::get<0>(allUsersTitles[index][inner_index] ).c_str()));
+                this->ui->tableWidget->setItem  (this->ui->tableWidget->rowCount() - 1, 6*index + 2,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))      )));
+                this->ui->tableWidget->setItem  (this->ui->tableWidget->rowCount() - 1, 6*index + 3,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20   )));
+                this->ui->tableWidget->setItem  (this->ui->tableWidget->rowCount() - 1, 6*index + 4,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.   )));
+                this->ui->tableWidget->setItem  (this->ui->tableWidget->rowCount() - 1, 6*index + 5,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.  )));
+                std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) = this->ui->tableWidget->rowCount();
             }
             else
             {
-                this->ui->tableWidget->setItem(innerFoundIndex, 6*index + 1,new QTableWidgetItem(                  std::get<0>( allUsersTitles[index][inner_index] ).c_str()));
-                this->ui->tableWidget->setItem(innerFoundIndex, 6*index + 2,new QTableWidgetItem( QString::number( std::get<1>( allUsersTitles[index][inner_index] )       )));
-                this->ui->tableWidget->setItem(innerFoundIndex, 6*index + 3,new QTableWidgetItem( QString::number( std::get<1>( allUsersTitles[index][inner_index] )*20    )));
-                this->ui->tableWidget->setItem(innerFoundIndex, 6*index + 4,new QTableWidgetItem( QString::number( std::get<1>( allUsersTitles[index][inner_index] )/3.    )));
-                this->ui->tableWidget->setItem(innerFoundIndex, 6*index + 5,new QTableWidgetItem( QString::number( std::get<1>( allUsersTitles[index][inner_index] )/72.   )));
+                std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) = innerFoundIndex;
+                this->ui->tableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 1,new QTableWidgetItem(                               std::get<0>(allUsersTitles[index][inner_index] ).c_str()));
+                this->ui->tableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 2,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))      )));
+                this->ui->tableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 3,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20   )));
+                this->ui->tableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 4,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.   )));
+                this->ui->tableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 5,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.  )));
+
             }
-            info.episode += std::get<1>( allUsersTitles[index][inner_index] );
-            info.minuts  += std::get<1>( allUsersTitles[index][inner_index] )*20;
-            info.hours   += std::get<1>( allUsersTitles[index][inner_index] )/3.;
-            info.days    += std::get<1>( allUsersTitles[index][inner_index] )/72.;
+            info.episode += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ));
+            info.minuts  += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20;
+            info.hours   += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.;
+            info.days    += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.;
         }
-        this->userInfoVector.push_back(info);;
+        this->userInfoVector.push_back(info);
+        
+        
+        
+        
     }
     this->ui->tableWidget->setSortingEnabled(true);
     this->ui->tableWidget->insertRow(0);
