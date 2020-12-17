@@ -7,6 +7,7 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
+    std::atomic_init(&size, 0);
 }
 
 Widget::~Widget()
@@ -14,41 +15,8 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::on_pushButton_clicked()
+void Widget::do_work(const std::string &e)
 {
-    /*
-    430622 
-    536964
-    454905
-    269705
-    729512
-    676306
-    
-    ub
-    bb
-    iy
-    rl
-    tp
-    i
-    */
-    std::size_t dialogReturnedValue = 0;
-    Dialog d(this);
-    dialogReturnedValue = d.exec();
-    if(dialogReturnedValue == QDialog::Rejected) return;
-    QString text2 = d.getText();
-    qDebug((text2.toStdString()).c_str());
-    std::string text = text2.toUtf8().constData();
-    std::vector <std::string> idVector;
-    std::size_t pos;
-    while ((pos = text.find('\n')) != std::string::npos) {
-    std::string token = text.substr(0, pos);
-    text.erase(0, pos + 1);
-    idVector.push_back(token);
-  }
-    if ("" != text ) idVector.push_back(text);
-    std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
-    for(const auto & e : idVector)
-    {
         std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> titles;
         QNetworkAccessManager manager;
         QNetworkRequest request(QUrl(std::string ("https://yummyanime.club/users/id" + e + "?tab=watched" ).c_str()));
@@ -132,8 +100,61 @@ void Widget::on_pushButton_clicked()
                 titles.push_back(std::make_pair(sub_str,std::make_pair(std::atoi(g.c_str()),0)));
             }
         }
-        allUsersTitles.push_back(titles);
+        this->mux.lock();
+        this->allUsersTitles.push_back(titles);
+        this->size++;
+        qDebug("thread ends");
+        this->mux.unlock();
+        
+}
+
+
+void Widget::on_pushButton_clicked()
+{
+
+    /*
+    771703
+    430622
+    536964
+    454905
+    269705
+    729512
+    676306
+
+    
+    ub
+    bb
+    iy
+    rl
+    tp
+    i
+    
+    */
+    std::size_t dialogReturnedValue = 0;
+    Dialog d(this);
+    dialogReturnedValue = d.exec();
+    auto tp = std::chrono::system_clock::now();
+    if(dialogReturnedValue == QDialog::Rejected) return;
+    QString text2 = d.getText();
+    qDebug((text2.toStdString()).c_str());
+    std::string text = text2.toUtf8().constData();
+    std::vector <std::string> idVector;
+    std::size_t pos;
+    while ((pos = text.find('\n')) != std::string::npos) {
+    std::string token = text.substr(0, pos);
+    text.erase(0, pos + 1);
+    idVector.push_back(token);
+  }
+    if ("" != text ) idVector.push_back(text);
+    for(const auto & e : idVector)
+    {
+        std::thread(&Widget::do_work,this,std::ref(e)).detach();
+        //auto a = std::async(&Widget::do_work, this, std::ref(e));
     }
+    
+
+    
+    while (this->size.load() != idVector.size()) std::this_thread::yield();
     QStringList lst;
     for(const auto & e: idVector) lst << QString::fromStdString(e) << QString::fromStdString(std::string("тайтл")) << QString::fromStdString(std::string("серии")) << QString::fromStdString(std::string("время в минутах")) << QString::fromStdString(std::string("время в часах")) << QString::fromStdString(std::string("время в сутках"));
     this->ui->tableWidget->setColumnCount(lst.size()*6);
@@ -160,9 +181,6 @@ void Widget::on_pushButton_clicked()
                 }
             }
             skip:
-            
-            
-            
             if(false == b)
             {
                 this->ui->tableWidget->insertRow(this->ui->tableWidget->rowCount());
@@ -189,18 +207,16 @@ void Widget::on_pushButton_clicked()
             info.days    += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.;
         }
         this->userInfoVector.push_back(info);
-        
-        
-        
-        
     }
     this->ui->tableWidget->setSortingEnabled(true);
     this->ui->tableWidget->insertRow(0);
     for (std::size_t var = 0; var < this->userInfoVector.size(); ++var) {
-        //this->ui->tableWidget->setItem(0, 6*var + 0,new QTableWidgetItem( idVector[var].c_str() ));
         this->ui->tableWidget->setItem(0, 6*var + 2,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode )));
         this->ui->tableWidget->setItem(0, 6*var + 3,new QTableWidgetItem( QString::number( this->userInfoVector[var].minuts  )));
         this->ui->tableWidget->setItem(0, 6*var + 4,new QTableWidgetItem( QString::number( this->userInfoVector[var].hours   )));
         this->ui->tableWidget->setItem(0, 6*var + 5,new QTableWidgetItem( QString::number( this->userInfoVector[var].days    )));
     }
+    auto tp2 = std::chrono::system_clock::now();
+     std::chrono::duration<double> diff = tp2 - tp;
+    qDebug( (std::to_string( diff.count() ).c_str() ));
 }

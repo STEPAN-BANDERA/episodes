@@ -15,6 +15,10 @@
 #include <QAbstractItemModel>
 #include <QAbstractTableModel>
 #include <algorithm>
+#include <mutex>
+#include <atomic>
+#include <chrono>
+#include <numeric>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -32,7 +36,10 @@ private slots:
      void on_pushButton_clicked();
      
 private:
-
+    std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
+    std::mutex mux;
+    std::atomic<std::size_t> size;
+    void do_work(const std::string &e);
     struct userInfo
     {
         double hours = 0.;
