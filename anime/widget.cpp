@@ -6,7 +6,31 @@ Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
 {
-    ui->setupUi(this);
+    this->ui->setupUi(this);
+    this->ptableWidget = new QTableWidget;
+    
+    this->ptitlesComboBoxList = new QComboBox;
+    this->pidComboBoxList = new QComboBox;
+    
+    this->pcallOpenLink  = new QPushButton("Open choosed profile");
+    this->pcallDialogWindow = new QPushButton("Got input ids");
+
+    this->pHorizontalbxLayout = new QHBoxLayout;
+    this->pVerticallbxLayout = new QVBoxLayout;
+    this->pHorizontalbxLayout->addWidget(this->ptitlesComboBoxList, 1);
+    
+    this->pHorizontalbxLayout->addWidget(this->pidComboBoxList, 2);
+    this->pHorizontalbxLayout->addWidget(this->pcallOpenLink, 3);
+    this->pHorizontalbxLayout->addWidget(this->pcallDialogWindow, 4);
+    this->pVerticallbxLayout->addWidget(this->ptableWidget);
+    this->pVerticallbxLayout->addLayout(this->pHorizontalbxLayout); 
+    this->setWindowTitle("Check profile");
+  
+    this->setLayout(this->pVerticallbxLayout);
+    
+    connect(pcallDialogWindow, SIGNAL (released()),this, SLOT (on_pushButton_clicked()));
+    connect(pcallOpenLink, SIGNAL (released()),this, SLOT (on_pushButton_2_clicked()));
+    
     std::atomic_init(&size, 0);
 }
 
@@ -120,14 +144,7 @@ void Widget::on_pushButton_clicked()
 269705
 729512
 676306
-
-    
-    ubЫ
-    bb
-    iy
-    rl
-    tp
-    i
+486214
     
     */
     std::size_t dialogReturnedValue = 0;
@@ -149,7 +166,7 @@ void Widget::on_pushButton_clicked()
     if ("" != text ) idVector.push_back(text);
     for(const auto & e : idVector)
     {
-        this->ui->comboBox->addItem(QString::fromStdString("https://yummyanime.club/users/id" +e));
+        this->pidComboBoxList->addItem(QString::fromStdString("https://yummyanime.club/users/id" +e));
         std::thread(&Widget::do_work,this,std::ref(e)).detach();
         //auto a = std::async(&Widget::do_work, this, std::ref(e));
     }
@@ -159,8 +176,8 @@ void Widget::on_pushButton_clicked()
     while (this->size.load() != idVector.size()) std::this_thread::yield();
     QStringList lst;
     for(const auto & e: idVector) lst << QString::fromStdString(e) << QString::fromStdString(std::string("тайтл")) << QString::fromStdString(std::string("серии")) << QString::fromStdString(std::string("время в минутах")) << QString::fromStdString(std::string("время в часах")) << QString::fromStdString(std::string("время в сутках"));
-    this->ui->tableWidget->setColumnCount(lst.size()*6);
-    this->ui->tableWidget->setHorizontalHeaderLabels(lst);
+    this->ptableWidget->setColumnCount(idVector.size()*6);
+    this->ptableWidget->setHorizontalHeaderLabels(lst);
     //std::sort(allUsersTitles.begin(),allUsersTitles.end());
     
     for (std::size_t index = 0; index < allUsersTitles.size(); index++ )
@@ -185,22 +202,22 @@ void Widget::on_pushButton_clicked()
             skip:
             if(false == b)
             {
-                this->ui->tableWidget->insertRow(this->ui->tableWidget->rowCount());
-                this->ui->tableWidget->setItem  (this->ui->tableWidget->rowCount() - 1, 6*index + 1,new QTableWidgetItem(                               std::get<0>(allUsersTitles[index][inner_index] ).c_str()));
-                this->ui->tableWidget->setItem  (this->ui->tableWidget->rowCount() - 1, 6*index + 2,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))      )));
-                this->ui->tableWidget->setItem  (this->ui->tableWidget->rowCount() - 1, 6*index + 3,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20   )));
-                this->ui->tableWidget->setItem  (this->ui->tableWidget->rowCount() - 1, 6*index + 4,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.   )));
-                this->ui->tableWidget->setItem  (this->ui->tableWidget->rowCount() - 1, 6*index + 5,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.  )));
-                std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) = this->ui->tableWidget->rowCount();
+                this->ptableWidget->insertRow(this->ptableWidget->rowCount());
+                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 1,new QTableWidgetItem(                               std::get<0>(allUsersTitles[index][inner_index] ).c_str()));
+                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 2,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))      )));
+                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 3,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20   )));
+                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 4,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.   )));
+                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 5,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.  )));
+                std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) = this->ptableWidget->rowCount();
             }
             else
             {
                 std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) = innerFoundIndex;
-                this->ui->tableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 1,new QTableWidgetItem(                               std::get<0>(allUsersTitles[index][inner_index] ).c_str()));
-                this->ui->tableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 2,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))      )));
-                this->ui->tableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 3,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20   )));
-                this->ui->tableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 4,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.   )));
-                this->ui->tableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 5,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.  )));
+                this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 1,new QTableWidgetItem(                               std::get<0>(allUsersTitles[index][inner_index] ).c_str()));
+                this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 2,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))      )));
+                this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 3,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20   )));
+                this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 4,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.   )));
+                this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 5,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.  )));
             }
             info.episode += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ));
             info.minuts  += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20;
@@ -210,14 +227,14 @@ void Widget::on_pushButton_clicked()
         info.titles_ = allUsersTitles[index].size();
         this->userInfoVector.push_back(info);
     }
-    //this->ui->tableWidget->setSortingEnabled(true);
-    this->ui->tableWidget->insertRow(0);
+    //this->ptableWidget->setSortingEnabled(true);
+    this->ptableWidget->insertRow(0);
     for (std::size_t var = 0; var < this->userInfoVector.size(); ++var) {
-        this->ui->tableWidget->setItem(0, 6*var + 1,new QTableWidgetItem( QString::number( this->userInfoVector[var].titles_ )));
-        this->ui->tableWidget->setItem(0, 6*var + 2,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode )));
-        this->ui->tableWidget->setItem(0, 6*var + 3,new QTableWidgetItem( QString::number( this->userInfoVector[var].minuts  )));
-        this->ui->tableWidget->setItem(0, 6*var + 4,new QTableWidgetItem( QString::number( this->userInfoVector[var].hours   )));
-        this->ui->tableWidget->setItem(0, 6*var + 5,new QTableWidgetItem( QString::number( this->userInfoVector[var].days    )));
+        this->ptableWidget->setItem(0, 6*var + 1,new QTableWidgetItem( QString::fromStdString( "Всего: " +std::to_string(this->userInfoVector[var].titles_) )));
+        this->ptableWidget->setItem(0, 6*var + 2,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode )));
+        this->ptableWidget->setItem(0, 6*var + 3,new QTableWidgetItem( QString::number( this->userInfoVector[var].minuts  )));
+        this->ptableWidget->setItem(0, 6*var + 4,new QTableWidgetItem( QString::number( this->userInfoVector[var].hours   )));
+        this->ptableWidget->setItem(0, 6*var + 5,new QTableWidgetItem( QString::number( this->userInfoVector[var].days    )));
     }
     auto tp2 = std::chrono::system_clock::now();
      std::chrono::duration<double> diff = tp2 - tp;
@@ -226,7 +243,7 @@ void Widget::on_pushButton_clicked()
 
 void Widget::on_pushButton_2_clicked()
 {
-    QVariant a = this->ui->comboBox->currentText();
+    QVariant a = this->pidComboBoxList->currentText();
     QString s = a.toString();
     QUrl _url(s);
     QDesktopServices::openUrl(_url);

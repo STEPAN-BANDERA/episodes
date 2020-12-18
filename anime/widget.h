@@ -31,26 +31,31 @@ class Widget : public QWidget
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
-    
 private slots:
      void on_pushButton_clicked();
-     
      void on_pushButton_2_clicked();
      
 private:
-    std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
-    std::mutex mux;
-    std::atomic<std::size_t> size;
-    void do_work(const std::string &e);
-    struct userInfo
-    {
-        double hours = 0.;
-        double days = 0.;
-        std::size_t titles_ = 0;
-        std::size_t minuts = 0;
-        std::size_t episode = 0;
-    };
-    std::vector <userInfo> userInfoVector;
-    Ui::Widget *ui;
+     QTableWidget * ptableWidget;
+     QComboBox * ptitlesComboBoxList,*pidComboBoxList;
+     QPushButton * pcallDialogWindow, *pcallOpenLink;
+     QHBoxLayout * pHorizontalbxLayout;
+     QVBoxLayout * pVerticallbxLayout;
+     std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
+     std::mutex mux;
+     std::atomic<std::size_t> size;
+     
+     void do_work(const std::string &e);
+     
+     struct userInfo
+     {
+         double hours = 0.;
+         double days = 0.;
+         std::size_t titles_ = 0;
+         std::size_t minuts = 0;
+         std::size_t episode = 0;
+     };
+     std::vector <userInfo> userInfoVector;
+     Ui::Widget *ui;
 };
 #endif // WIDGET_H
