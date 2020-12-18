@@ -1,6 +1,6 @@
 #ifndef WIDGET_H
 #define WIDGET_H
-
+#include <sortcombobox.h>
 #include <QWidget>
 #include <QApplication>
 #include <QCoreApplication>
@@ -37,7 +37,8 @@ private slots:
      
 private:
      QTableWidget * ptableWidget;
-     QComboBox * ptitlesComboBoxList,*pidComboBoxList;
+     QComboBox *pidComboBoxList;
+     SortComboBox * sortComboBox;
      QPushButton * pcallDialogWindow, *pcallOpenLink;
      QHBoxLayout * pHorizontalbxLayout;
      QVBoxLayout * pVerticallbxLayout;

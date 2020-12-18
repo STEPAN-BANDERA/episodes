@@ -9,7 +9,7 @@ Widget::Widget(QWidget *parent)
     this->ui->setupUi(this);
     this->ptableWidget = new QTableWidget;
     
-    this->ptitlesComboBoxList = new QComboBox;
+    this->sortComboBox = new SortComboBox;
     this->pidComboBoxList = new QComboBox;
     
     this->pcallOpenLink  = new QPushButton("Open choosed profile");
@@ -17,19 +17,19 @@ Widget::Widget(QWidget *parent)
 
     this->pHorizontalbxLayout = new QHBoxLayout;
     this->pVerticallbxLayout = new QVBoxLayout;
-    this->pHorizontalbxLayout->addWidget(this->ptitlesComboBoxList, 1);
+    this->pHorizontalbxLayout->addWidget(this->sortComboBox, 3);
     
-    this->pHorizontalbxLayout->addWidget(this->pidComboBoxList, 2);
-    this->pHorizontalbxLayout->addWidget(this->pcallOpenLink, 3);
-    this->pHorizontalbxLayout->addWidget(this->pcallDialogWindow, 4);
-    this->pVerticallbxLayout->addWidget(this->ptableWidget);
-    this->pVerticallbxLayout->addLayout(this->pHorizontalbxLayout); 
+    this->pHorizontalbxLayout->addWidget(this->pidComboBoxList, 3);
+    this->pHorizontalbxLayout->addWidget(this->pcallOpenLink, 2);
+    this->pHorizontalbxLayout->addWidget(this->pcallDialogWindow, 2);
+    this->pVerticallbxLayout ->addWidget(this->ptableWidget);
+    this->pVerticallbxLayout ->addLayout(this->pHorizontalbxLayout); 
     this->setWindowTitle("Check profile");
   
     this->setLayout(this->pVerticallbxLayout);
     
-    connect(pcallDialogWindow, SIGNAL (released()),this, SLOT (on_pushButton_clicked()));
-    connect(pcallOpenLink, SIGNAL (released()),this, SLOT (on_pushButton_2_clicked()));
+    connect(pcallDialogWindow, SIGNAL (released()),this, SLOT (  on_pushButton_clicked()));
+    connect(pcallOpenLink,     SIGNAL (released()),this, SLOT (on_pushButton_2_clicked()));
     
     std::atomic_init(&size, 0);
 }
@@ -72,7 +72,7 @@ void Widget::do_work(const std::string &e)
             }
         }
         std::size_t _size = 0;
-        for (auto & e : vct2){
+        for (const auto & e : vct2){
             QNetworkAccessManager manager;
             QNetworkRequest request(QUrl( (std::string("https://yummyanime.club") + e).c_str()));
             QNetworkReply *reply(manager.get(request));
@@ -171,9 +171,8 @@ void Widget::on_pushButton_clicked()
         //auto a = std::async(&Widget::do_work, this, std::ref(e));
     }
     
-
-    
     while (this->size.load() != idVector.size()) std::this_thread::yield();
+    
     QStringList lst;
     for(const auto & e: idVector) lst << QString::fromStdString(e) << QString::fromStdString(std::string("тайтл")) << QString::fromStdString(std::string("серии")) << QString::fromStdString(std::string("время в минутах")) << QString::fromStdString(std::string("время в часах")) << QString::fromStdString(std::string("время в сутках"));
     this->ptableWidget->setColumnCount(idVector.size()*6);
@@ -237,14 +236,12 @@ void Widget::on_pushButton_clicked()
         this->ptableWidget->setItem(0, 6*var + 5,new QTableWidgetItem( QString::number( this->userInfoVector[var].days    )));
     }
     auto tp2 = std::chrono::system_clock::now();
-     std::chrono::duration<double> diff = tp2 - tp;
+    std::chrono::duration<double> diff = tp2 - tp;
     qDebug( (std::to_string( diff.count() ).c_str() ));
+    for (const auto & e : idVector) this->sortComboBox->addItem(QString::fromStdString( ("https://yummyanime.club/users/id" + e)  ));
 }
 
 void Widget::on_pushButton_2_clicked()
 {
-    QVariant a = this->pidComboBoxList->currentText();
-    QString s = a.toString();
-    QUrl _url(s);
-    QDesktopServices::openUrl(_url);
+    QDesktopServices::openUrl(QUrl(QString::fromStdString((this->pidComboBoxList->currentText().toStdString()))));
 }

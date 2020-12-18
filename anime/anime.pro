@@ -19,11 +19,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     dialog.cpp \
     main.cpp \
+    sortcombobox.cpp \
     tablesortmodel.cpp \
     widget.cpp
 
 HEADERS += \
     dialog.h \
+    sortcombobox.h \
     tablesortmodel.h \
     widget.h
 
