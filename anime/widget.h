@@ -35,6 +35,8 @@ public:
 private slots:
      void on_pushButton_clicked();
      
+     void on_pushButton_2_clicked();
+     
 private:
     std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
     std::mutex mux;
@@ -44,6 +46,7 @@ private:
     {
         double hours = 0.;
         double days = 0.;
+        std::size_t titles_ = 0;
         std::size_t minuts = 0;
         std::size_t episode = 0;
     };
