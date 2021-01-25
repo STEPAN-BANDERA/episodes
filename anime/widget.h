@@ -8,8 +8,6 @@
 #include <QtNetwork>
 #include <QString>
 #include <QByteArray>
-#include <string>
-#include <vector>
 #include <QtWidgets>
 #include <QScrollBar>
 #include <QAbstractItemModel>
@@ -19,6 +17,16 @@
 #include <atomic>
 #include <chrono>
 #include <numeric>
+#include <string>
+#include <vector>
+#include <boost/asio.hpp>
+#include <QFileDialog>
+#include <QTextStream>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <type_traits>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -32,22 +40,25 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 private slots:
-     void on_pushButton_clicked();
-     void on_pushButton_2_clicked();
+     void GetInput();
+     void OpenFile();
+
+     //void on_pushButton_2_clicked();
      
 private:
      QTableWidget * ptableWidget;
      QComboBox *pidComboBoxList;
      SortComboBox * sortComboBox;
-     QPushButton * pcallDialogWindow, *pcallOpenLink;
+     QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile;
      QHBoxLayout * pHorizontalbxLayout;
      QVBoxLayout * pVerticallbxLayout;
      std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
+     std::vector<std::string> allTitles;
      std::mutex mux;
      std::atomic<std::size_t> size;
-     
-     void do_work(const std::string &e);
-     
+     std::vector <std::string> idVector;
+     void do_work(const std::string &e) noexcept; 
+     void SaveFile( const std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * v,  std::string & str);
      struct userInfo
      {
          double hours = 0.;
@@ -60,3 +71,17 @@ private:
      Ui::Widget *ui;
 };
 #endif // WIDGET_H
+
+    /*
+     * 
+771703
+430622
+486214
+536964
+454905
+269705
+701345
+729512
+676306
+    
+    */

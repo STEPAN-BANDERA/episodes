@@ -1,6 +1,6 @@
 QT       += core gui network widgets
 
-CONFIG += c++11
+CONFIG += c++14
 
 TEMPLATE = app
 DESTDIR  = ../../build

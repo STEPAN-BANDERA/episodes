@@ -7,29 +7,35 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     this->ui->setupUi(this);
+    this->allTitles.reserve(1000);
+    this->allUsersTitles.reserve(10);
     this->ptableWidget = new QTableWidget;
-    
+
     this->sortComboBox = new SortComboBox;
     this->pidComboBoxList = new QComboBox;
-    
+
     this->pcallOpenLink  = new QPushButton("Open choosed profile");
-    this->pcallDialogWindow = new QPushButton("Got input ids");
+    this->pcallDialogWindow = new QPushButton("Gеt input ids");
+    this->pOpenJsonFile = new QPushButton("Add Data From File");
+    
 
     this->pHorizontalbxLayout = new QHBoxLayout;
     this->pVerticallbxLayout = new QVBoxLayout;
     this->pHorizontalbxLayout->addWidget(this->sortComboBox, 3);
-    
+
     this->pHorizontalbxLayout->addWidget(this->pidComboBoxList, 3);
     this->pHorizontalbxLayout->addWidget(this->pcallOpenLink, 2);
     this->pHorizontalbxLayout->addWidget(this->pcallDialogWindow, 2);
+    this->pHorizontalbxLayout->addWidget(this->pOpenJsonFile, 2);
     this->pVerticallbxLayout ->addWidget(this->ptableWidget);
     this->pVerticallbxLayout ->addLayout(this->pHorizontalbxLayout); 
     this->setWindowTitle("Check profile");
-  
+
     this->setLayout(this->pVerticallbxLayout);
     
-    connect(pcallDialogWindow, SIGNAL (released()),this, SLOT (  on_pushButton_clicked()));
-    connect(pcallOpenLink,     SIGNAL (released()),this, SLOT (on_pushButton_2_clicked()));
+    connect(pcallDialogWindow, SIGNAL (released()),this, SLOT (  GetInput()));
+    //connect(pcallOpenLink,     SIGNAL (released()),this, SLOT (on_pushButton_2_clicked()));
+    connect(pOpenJsonFile,     SIGNAL (released()),this, SLOT (  OpenFile()));
     
     std::atomic_init(&size, 0);
 }
@@ -39,7 +45,7 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::do_work(const std::string &e)
+void Widget::do_work(const std::string &e) noexcept
 {
         std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> titles;
         QNetworkAccessManager manager;
@@ -132,21 +138,8 @@ void Widget::do_work(const std::string &e)
         
 }
 
-
-void Widget::on_pushButton_clicked()
+void Widget::GetInput()
 {
-
-    /*
-771703
-430622
-536964
-454905
-269705
-729512
-676306
-486214
-    
-    */
     std::size_t dialogReturnedValue = 0;
     Dialog d(this);
     dialogReturnedValue = d.exec();
@@ -155,27 +148,37 @@ void Widget::on_pushButton_clicked()
     QString text2 = d.getText();
     qDebug((text2.toStdString()).c_str());
     std::string text = text2.toUtf8().constData();
-    std::vector <std::string> idVector;
+    this->idVector;
     std::size_t pos;
     while ((pos = text.find('\n')) != std::string::npos) {
         std::string token = text.substr(0, pos);
         text.erase(0, pos + 1);
-        idVector.push_back(token);
+        this->idVector.push_back(token);
     }
-  
-    if ("" != text ) idVector.push_back(text);
+    if ("" != text ) this->idVector.push_back(text);
+   
+    //for(const auto & e : idVector)
+    //{
+        //this->pidComboBoxList->addItem(QString::fromStdString("https://yummyanime.club/users/id" +e));
+        //std::thread(&Widget::do_work,this,std::ref(e)).detach();
+        //auto a = std::async(&Widget::do_work, this, std::ref(e));
+    //}
+    
+    boost::asio::thread_pool pool(15);
+    
     for(const auto & e : idVector)
     {
-        this->pidComboBoxList->addItem(QString::fromStdString("https://yummyanime.club/users/id" +e));
-        std::thread(&Widget::do_work,this,std::ref(e)).detach();
-        //auto a = std::async(&Widget::do_work, this, std::ref(e));
+        boost::asio::post(pool, [this,&e](){this->do_work(e);} );
     }
+    pool.join();
     
-    while (this->size.load() != idVector.size()) std::this_thread::yield();
+    while (this->size.load() != this->idVector.size()) std::this_thread::yield();
+    
+    
     
     QStringList lst;
-    for(const auto & e: idVector) lst << QString::fromStdString(e) << QString::fromStdString(std::string("тайтл")) << QString::fromStdString(std::string("серии")) << QString::fromStdString(std::string("время в минутах")) << QString::fromStdString(std::string("время в часах")) << QString::fromStdString(std::string("время в сутках"));
-    this->ptableWidget->setColumnCount(idVector.size()*6);
+    for(const auto & e: this->idVector) lst << QString::fromStdString(e) << QString::fromStdString(std::string("тайтл")) << QString::fromStdString(std::string("серии")) << QString::fromStdString(std::string("время в минутах")) << QString::fromStdString(std::string("время в часах")) << QString::fromStdString(std::string("время в сутках"));
+    this->ptableWidget->setColumnCount(this->idVector.size()*6);
     this->ptableWidget->setHorizontalHeaderLabels(lst);
     //std::sort(allUsersTitles.begin(),allUsersTitles.end());
     
@@ -184,6 +187,7 @@ void Widget::on_pushButton_clicked()
     userInfo info;
         for (std::size_t inner_index = 0; inner_index < allUsersTitles[index].size(); inner_index++ )
         {
+            this->allTitles.push_back(std::get<0>(allUsersTitles[index][inner_index] ));
             bool b = 0;
             std::size_t innerFoundIndex;
             for (std::size_t index_ = 0; index_ < index; index_++ )
@@ -238,10 +242,76 @@ void Widget::on_pushButton_clicked()
     auto tp2 = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = tp2 - tp;
     qDebug( (std::to_string( diff.count() ).c_str() ));
-    for (const auto & e : idVector) this->sortComboBox->addItem(QString::fromStdString( ("https://yummyanime.club/users/id" + e)  ));
+    tp = std::chrono::system_clock::now();
+    boost::asio::thread_pool pool2(15);
+    for(std::size_t index = 0; index < this->allUsersTitles.size() ; index++)
+    {
+        std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * a =&(allUsersTitles[index]);
+        boost::asio::post(pool2, [this, index, a]()
+        {
+            this->SaveFile(a, std::ref(idVector[index])) ;
+        } );
+    }
+    pool2.join();
+    while (this->size.load() != this->idVector.size()) std::this_thread::yield();
+    tp2 = std::chrono::system_clock::now();
+    diff = tp2 - tp;
+    qDebug( (std::to_string( diff.count() ).c_str() ));
+    
+    //this->allTitles.erase(std::unique(this->allTitles.begin(),this->allTitles.end()),this->allTitles.end());
+    //for (const auto & e : this->idVector) this->sortComboBox->addItem(QString::fromStdString( ("https://yummyanime.club/users/id" + e)  ));
+    
 }
 
-void Widget::on_pushButton_2_clicked()
+void Widget::OpenFile()
 {
-    QDesktopServices::openUrl(QUrl(QString::fromStdString((this->pidComboBoxList->currentText().toStdString()))));
+    QString json_filter = "JSON (*.json)";
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open file"), "/", json_filter, &json_filter,QFileDialog::DontUseNativeDialog);
+    
+    if(filename.isEmpty())
+    {
+    
+    }
+    else 
+    {
+    
+    }
+    
+    
 }
+
+void Widget::SaveFile(  const std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * v ,  std::string & str )
+{
+    QString json_filter = "JSON (*.json)";
+    QDateTime current = QDateTime::currentDateTime();
+    QString filename = QString::fromStdString( current.toString("yyyy.MM.dd").toStdString() + " " + str);
+    //QString filename = QFileDialog::getSaveFileName(this, tr("Save file"), "/", json_filter, &json_filter,QFileDialog::DontUseNativeDialog);
+    
+    if(filename.isEmpty())
+    {
+    
+    }
+    else 
+    {
+        QJsonDocument document;
+        QByteArray json_data = document.toJson();
+        QFile output(filename);
+        if( output.open(QIODevice::WriteOnly | QIODevice::Text)){
+            output.write(json_data);
+            output.close();
+            QMessageBox::information(this,tr("Succed"), tr("File Saved"));
+        } 
+        else 
+        {
+            QMessageBox::critical(this,tr("Error"), output.errorString());
+        }
+        
+    }
+    
+    
+}
+
+//void Widget::on_pushButton_2_clicked()
+//{
+//    QDesktopServices::openUrl(QUrl(QString::fromStdString((this->pidComboBoxList->currentText().toStdString()))));
+//}
