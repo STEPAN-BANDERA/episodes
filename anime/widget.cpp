@@ -61,7 +61,7 @@ void Widget::do_work(const std::string &e) noexcept
         std::size_t pos_start = 0;
         while ( (pos_start = str.find("data-typeid=")) != std::string::npos){
             vct.push_back(pos_start + 16);
-            str.erase ( str.begin() , str.begin() + 16 + pos_start);     // get from "live" to the end
+            str.erase ( str.begin() , str.begin() + 16 + pos_start);     //
         }
         std::size_t index = 0 ;
         std::vector <std::string> vct2;
@@ -79,6 +79,22 @@ void Widget::do_work(const std::string &e) noexcept
         }
         std::size_t _size = 0;
         for (const auto & e : vct2){
+        
+//            std::string image_path = "";
+//            pos_start = str.find("<img src=\"/img/posters/");
+            
+//            while ( isdigit(str[pos_start + 23]))
+//            {
+//                image_path += str[pos_start + 23];
+//                ++pos_start;
+                
+//            }
+//            image_path = ("https://yummyanime.club/img/posters/" + image_path + ".jpg");
+//            qDebug() << image_path.c_str();
+        
+        
+        
+        
             QNetworkAccessManager manager;
             QNetworkRequest request(QUrl( (std::string("https://yummyanime.club") + e).c_str()));
             QNetworkReply *reply(manager.get(request));
@@ -105,31 +121,34 @@ void Widget::do_work(const std::string &e) noexcept
                 ++index;
             }
             std::size_t pos_start = str.find("Серии:");
+            std::string g;
             if (std::isdigit(str[pos_start + 21]))
             {
-                std::string g = "   ";
+                g = "   ";
                 g[0] = str[pos_start + 19];
                 g[1] = str[pos_start + 20];
                 g[2] = str[pos_start + 21];
-                _size  += std::atoi(g.c_str());
-                titles.push_back(std::make_pair(sub_str,std::make_pair(std::atoi(g.c_str()),0)));
             }
             else if (std::isdigit(str[pos_start + 20]))
             {
-                std::string g = "  ";
+                g = "  ";
                 g[0] = str[pos_start + 19];
                 g[1] = str[pos_start + 20];
-                _size  += std::atoi(g.c_str());
-                titles.push_back(std::make_pair(sub_str,std::make_pair(std::atoi(g.c_str()),0)));
             }
             else 
             {
-                std::string g = " ";
+                g = " ";
                 g[0] = str[pos_start + 19];
-                _size  += std::atoi(g.c_str());
-                titles.push_back(std::make_pair(sub_str,std::make_pair(std::atoi(g.c_str()),0)));
+                
             }
+            _size  += std::atoi(g.c_str());
+            titles.push_back(std::make_pair(sub_str,std::make_pair(std::atoi(g.c_str()),0)));
         }
+        
+        
+        
+        
+        
         this->mux.lock();
         this->allUsersTitles.push_back(titles);
         //this->size++;

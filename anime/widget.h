@@ -56,7 +56,7 @@ private:
      std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
      std::mutex mux;
      //std::atomic<std::size_t> size;
-     std::vector <std::string> idVector , allTitles;
+     std::vector <std::string> idVector , allTitles, allImages;
      void do_work(const std::string &e) noexcept; 
      void FormTable() noexcept; 
      //void FormLogFiles() noexcept; 
