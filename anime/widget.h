@@ -26,6 +26,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QJsonArray>
 #include <type_traits>
 
 QT_BEGIN_NAMESPACE
@@ -53,12 +54,13 @@ private:
      QHBoxLayout * pHorizontalbxLayout;
      QVBoxLayout * pVerticallbxLayout;
      std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
-     std::vector<std::string> allTitles;
      std::mutex mux;
-     std::atomic<std::size_t> size;
-     std::vector <std::string> idVector;
+     //std::atomic<std::size_t> size;
+     std::vector <std::string> idVector , allTitles;
      void do_work(const std::string &e) noexcept; 
-     void SaveFile( const std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * v,  std::string & str);
+     void FormTable() noexcept; 
+     //void FormLogFiles() noexcept; 
+     //void SaveFile( const std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * v,  std::string & str) noexcept;
      struct userInfo
      {
          double hours = 0.;
@@ -69,6 +71,7 @@ private:
      };
      std::vector <userInfo> userInfoVector;
      Ui::Widget *ui;
+     std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;
 };
 #endif // WIDGET_H
 
