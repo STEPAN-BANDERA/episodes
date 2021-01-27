@@ -207,7 +207,6 @@ void Widget::FormTable() noexcept
     for (std::size_t index = 0; index < allUsersTitles.size(); index++ )
     {
         QJsonArray json_array;
-       
         userInfo info;
         for (std::size_t inner_index = 0; inner_index < allUsersTitles[index].size(); inner_index++ )
         {
@@ -237,8 +236,8 @@ void Widget::FormTable() noexcept
                 this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 5,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.  )));
                 std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) = this->ptableWidget->rowCount();
                 QJsonObject obj;
-                obj["тайтл"] = std::get<0>(allUsersTitles[index][inner_index] ).c_str() ;
-                obj["серии"] = QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] )));
+                obj["title"] = std::get<0>(allUsersTitles[index][inner_index] ).c_str() ;
+                obj["episodes"] = QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] )));
                 json_array.push_back(obj);
             }
             else
@@ -250,18 +249,16 @@ void Widget::FormTable() noexcept
                 this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 4,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.   )));
                 this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 5,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.  )));
                 QJsonObject obj;
-                obj["тайтл"] = std::get<0>(allUsersTitles[index][inner_index] ).c_str() ;
-                obj["серии"] = QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] )));
+                obj["title"] = std::get<0>(allUsersTitles[index][inner_index] ).c_str() ;
+                obj["episodes"] = QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] )));
                 json_array.push_back(obj);
             }
             info.episode += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ));
-            info.minuts  += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20;
-            info.hours   += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.;
-            info.days    += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.;
+            //info.minuts  += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20;
+            //info.hours   += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.;
+            //info.days    += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.;
         }
-        QDateTime current = QDateTime::currentDateTime();
-        
-        QString filename = QString::fromStdString( current.toString("yyyy.MM.dd").toStdString() + " " + current.toString("hh:mm:ss").toStdString() +" " + idVector[index] + ".json");
+        QString filename = QString::fromStdString( QDateTime::currentDateTime().toString("yyyy.MM.dd").toStdString() + " " + QDateTime::currentDateTime().toString("hh:mm:ss").toStdString() +" " + idVector[index] + ".json");
         QJsonDocument document;
         document.setArray(json_array);
         QByteArray json_data = document.toJson();
@@ -276,10 +273,10 @@ void Widget::FormTable() noexcept
     this->ptableWidget->insertRow(0);
     for (std::size_t var = 0; var < this->userInfoVector.size(); ++var) {
         this->ptableWidget->setItem(0, 6*var + 1,new QTableWidgetItem( QString::fromStdString( "Всего: " +std::to_string(this->userInfoVector[var].titles_) )));
-        this->ptableWidget->setItem(0, 6*var + 2,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode )));
-        this->ptableWidget->setItem(0, 6*var + 3,new QTableWidgetItem( QString::number( this->userInfoVector[var].minuts  )));
-        this->ptableWidget->setItem(0, 6*var + 4,new QTableWidgetItem( QString::number( this->userInfoVector[var].hours   )));
-        this->ptableWidget->setItem(0, 6*var + 5,new QTableWidgetItem( QString::number( this->userInfoVector[var].days    )));
+        this->ptableWidget->setItem(0, 6*var + 2,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode    )));
+        this->ptableWidget->setItem(0, 6*var + 3,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode*20 )));
+        this->ptableWidget->setItem(0, 6*var + 4,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode/3. )));
+        this->ptableWidget->setItem(0, 6*var + 5,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode/72.)));
     }
     this-> tp2 = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = tp2 - tp;
@@ -320,7 +317,28 @@ void Widget::OpenFile()
     }
     else 
     {
-    
+        
+        
+        QFile file;
+        file.setFileName(filename);
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+
+
+        QJsonParseError jsonError;
+        QJsonDocument docJson = QJsonDocument::fromJson(file.readAll(),&jsonError);
+        if (jsonError.error != QJsonParseError::NoError){
+            qDebug() << jsonError.errorString();
+        }
+        QList<QVariant> list = docJson.toVariant().toList();
+        QMap<QString, QVariant> map = list[0].toMap();
+        qDebug() << map["title"].toString();
+            
+            
+        //QMessageBox::about(this,tr("Error"), input.errorString());
+    }
+    //else
+    {
+        //QMessageBox::critical(this,tr("Error"), input.errorString());
     }
     
     
