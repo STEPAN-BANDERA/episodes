@@ -55,9 +55,9 @@ void Widget::do_work(const std::string &e) noexcept
         QEventLoop loop;
         QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
-        QByteArray arr = reply->readAll();
+        const QByteArray arr = reply->readAll();
         std::string str = arr.toStdString();
-        std::string str_copy= str,sub_str;
+        const std::string str_copy= str,sub_str;
         std::vector<std::size_t> vct;
         std::size_t pos_start = 0;
         while ( (pos_start = str.find("data-typeid=")) != std::string::npos){
@@ -74,7 +74,7 @@ void Widget::do_work(const std::string &e) noexcept
             ++index;
             if ((pos_start = str_copy.find("/", size_ )) != std::string::npos)
             {
-                std::size_t inner_size = str_copy.find("\"", pos_start);
+                const std::size_t inner_size = str_copy.find("\"", pos_start);
                 vct2.push_back( str_copy.substr( pos_start , inner_size - pos_start ));
             }
         }
@@ -102,12 +102,10 @@ void Widget::do_work(const std::string &e) noexcept
             QEventLoop loop;
             QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
             loop.exec();
-            QByteArray arr = reply->readAll();
-            std::string str;
-            str.reserve(200000);
-            str = arr.toStdString();
-            std::size_t pos_start2 = str.find("<h1>",0);
-            std::size_t end_start = str.find("</h1>",pos_start2 + 4);
+            const QByteArray arr = reply->readAll();
+            const std::string str= arr.toStdString();
+            const std::size_t pos_start2 = str.find("<h1>",0);
+            const std::size_t end_start = str.find("</h1>",pos_start2 + 4);
             std::string sub_str = str.substr(pos_start2 + 4, end_start - pos_start2);
             sub_str.erase(0, 20);
             std::size_t index=0;
@@ -121,27 +119,21 @@ void Widget::do_work(const std::string &e) noexcept
                 }
                 ++index;
             }
-            std::size_t pos_start = str.find("Серии:");
+            const std::size_t pos_start = str.find("Серии:");
             std::string g;
             if (std::isdigit(str[pos_start + 21]))
             {
                 g = "   ";
-                g[0] = str[pos_start + 19];
                 g[1] = str[pos_start + 20];
                 g[2] = str[pos_start + 21];
             }
             else if (std::isdigit(str[pos_start + 20]))
             {
                 g = "  ";
-                g[0] = str[pos_start + 19];
                 g[1] = str[pos_start + 20];
             }
-            else 
-            {
-                g = " ";
-                g[0] = str[pos_start + 19];
-                
-            }
+            else g = " ";
+            g[0] = str[pos_start + 19];
             _size  += std::atoi(g.c_str());
             
             titles.push_back( {sub_str,std::atoi(g.c_str()),0 });
@@ -150,7 +142,7 @@ void Widget::do_work(const std::string &e) noexcept
         this->allUsersTitles.push_back(titles);
         //this->size++;
         this->mux.unlock();
-        qDebug("thread ends");
+        qDebug(((std::string("thread ends") + e).c_str()));
 }
 
 
@@ -158,20 +150,19 @@ void Widget::do_work(const std::string &e) noexcept
 void Widget::GetInput()
 {
     Dialog d(this);
-    std::size_t dialogReturnedValue = d.exec();
+    if(d.exec() == QDialog::Rejected) return;
     this->tp = std::chrono::system_clock::now();
-    if(dialogReturnedValue == QDialog::Rejected) return;
-    QString text2 = d.getText();
+    const QString text2 = d.getText();
     qDebug((text2.toStdString()).c_str());
     std::string text = text2.toUtf8().constData();
-
     std::size_t pos;
     while ((pos = text.find('\n')) != std::string::npos) {
-        std::string token = text.substr(0, pos);
+        const std::string token = text.substr(0, pos);
         text.erase(0, pos + 1);
         this->idVector.push_back(token);
     }
-    if ("" != text ) idVector.push_back(text);
+    //if ("" != text ) idVector.push_back(text);
+    //std::sort(idVector.begin(),idVector.end());
     //for(const auto & e : idVector)
     //{
         //this->pidComboBoxList->addItem(QString::fromStdString("https://yummyanime.club/users/id" +e));
@@ -187,6 +178,9 @@ void Widget::GetInput()
     }
     pool.join();
     this->FormTable();
+    this->tp2 = std::chrono::system_clock::now();
+    const std::chrono::duration<double> diff = tp2 - tp;
+    qDebug( (std::to_string( diff.count() ).c_str() ));
     //this->FormLogFiles();
     //while (this->size.load() != this->idVector.size()) std::this_thread::yield();
     
@@ -199,20 +193,18 @@ void Widget::FormTable() noexcept
     for(const auto & e: this->idVector) lst << QString::fromStdString(e) << QString::fromStdString(std::string("тайтл")) << QString::fromStdString(std::string("серии")) << QString::fromStdString(std::string("время в минутах")) << QString::fromStdString(std::string("время в часах")) << QString::fromStdString(std::string("время в сутках"));
     this->ptableWidget->setColumnCount(this->idVector.size()*6);
     this->ptableWidget->setHorizontalHeaderLabels(lst);
-    //std::sort(allUsersTitles.begin(),allUsersTitles.end());
-    
-    for (std::size_t index = 0; index < allUsersTitles.size(); index++ )
+    for (std::size_t index = 0; index < allUsersTitles.size(); ++index )
     {
         QJsonArray json_array;
         userInfo info;
-        for (std::size_t inner_index = 0; inner_index < allUsersTitles[index].size(); inner_index++ )
+        for (std::size_t inner_index = 0; inner_index < allUsersTitles[index].size(); ++inner_index )
         {
-            this->allTitles.push_back(allUsersTitles[index][inner_index].title);
+            //this->allTitles.push_back(allUsersTitles[index][inner_index].title);
             bool b = 0;
             std::size_t innerFoundIndex;
-            for (std::size_t index_ = 0; index_ < index; index_++ )
+            for (std::size_t index_ = 0; index_ < index; ++index_ )
             {
-                for (std::size_t inner_index_ = 0; inner_index_ < allUsersTitles[index_].size(); inner_index_++ )
+                for (std::size_t inner_index_ = 0; inner_index_ < allUsersTitles[index_].size(); ++inner_index_ )
                 {
                     if(allUsersTitles[index][inner_index].title == allUsersTitles[index_][inner_index_].title) 
                     {
@@ -225,13 +217,13 @@ void Widget::FormTable() noexcept
             skip:
             if(false == b)
             {
-                this->ptableWidget->insertRow(this->ptableWidget->rowCount());
+                this->ptableWidget->insertRow(  (allUsersTitles[index][inner_index].position = this->ptableWidget->rowCount() + 1 ) - 1);
                 this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 1,new QTableWidgetItem(                  allUsersTitles[index][inner_index].title.c_str()));
                 this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 2,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes    )));
                 this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 3,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes*20 )));
                 this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 4,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes/3. )));
                 this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 5,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes/72.)));
-                allUsersTitles[index][inner_index].position = this->ptableWidget->rowCount();
+                //allUsersTitles[index][inner_index].position = this->ptableWidget->rowCount();
                 QJsonObject obj;
                 obj["title"] = allUsersTitles[index][inner_index].title.c_str() ;
                 obj["episodes"] = QString::number(allUsersTitles[index][inner_index].episodes);
@@ -275,10 +267,6 @@ void Widget::FormTable() noexcept
         this->ptableWidget->setItem(0, 6*var + 4,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode/3. )));
         this->ptableWidget->setItem(0, 6*var + 5,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode/72.)));
     }
-    this-> tp2 = std::chrono::system_clock::now();
-    std::chrono::duration<double> diff = tp2 - tp;
-    qDebug( (std::to_string( diff.count() ).c_str() ));
-    
     //this->allTitles.erase(std::unique(this->allTitles.begin(),this->allTitles.end()),this->allTitles.end());
     //for (const auto & e : this->idVector) this->sortComboBox->addItem(QString::fromStdString( ("https://yummyanime.club/users/id" + e)  ));
 }
