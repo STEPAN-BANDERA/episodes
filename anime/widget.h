@@ -47,20 +47,12 @@ private slots:
      //void on_pushButton_2_clicked();
      
 private:
-     QTableWidget * ptableWidget;
-     QComboBox *pidComboBoxList;
-     SortComboBox * sortComboBox;
-     QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile;
-     QHBoxLayout * pHorizontalbxLayout;
-     QVBoxLayout * pVerticallbxLayout;
-     std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
-     std::mutex mux;
-     //std::atomic<std::size_t> size;
-     std::vector <std::string> idVector , allTitles, allImages;
-     void do_work(const std::string &e) noexcept; 
-     void FormTable() noexcept; 
-     //void FormLogFiles() noexcept; 
-     //void SaveFile( const std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * v,  std::string & str) noexcept;
+     struct TitleInfo
+     {
+         std::string title;
+         std::size_t episodes;
+         std::size_t position;
+     };
      struct userInfo
      {
          double hours = 0.;
@@ -69,6 +61,22 @@ private:
          std::size_t minuts = 0;
          std::size_t episode = 0;
      };
+     QTableWidget * ptableWidget;
+     QComboBox *pidComboBoxList;
+     SortComboBox * sortComboBox;
+     QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile;
+     QHBoxLayout * pHorizontalbxLayout;
+     QVBoxLayout * pVerticallbxLayout;
+     //std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
+     std::vector<std::vector<TitleInfo>> allUsersTitles;
+     std::mutex mux;
+     //std::atomic<std::size_t> size;
+     std::vector <std::string> idVector , allTitles, allImages;
+     void do_work(const std::string &e) noexcept; 
+     void FormTable() noexcept; 
+     //void FormLogFiles() noexcept; 
+     //void SaveFile( const std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * v,  std::string & str) noexcept;
+     
      std::vector <userInfo> userInfoVector;
      Ui::Widget *ui;
      std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;

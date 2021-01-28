@@ -47,7 +47,8 @@ Widget::~Widget()
 
 void Widget::do_work(const std::string &e) noexcept
 {
-        std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> titles;
+        //std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> titles;
+        std::vector<Widget::TitleInfo> titles;
         QNetworkAccessManager manager;
         QNetworkRequest request(QUrl(std::string ("https://yummyanime.club/users/id" + e + "?tab=watched" ).c_str()));
         QNetworkReply *reply(manager.get(request));
@@ -142,13 +143,9 @@ void Widget::do_work(const std::string &e) noexcept
                 
             }
             _size  += std::atoi(g.c_str());
-            titles.push_back(std::make_pair(sub_str,std::make_pair(std::atoi(g.c_str()),0)));
+            
+            titles.push_back( {sub_str,std::atoi(g.c_str()),0 });
         }
-        
-        
-        
-        
-        
         this->mux.lock();
         this->allUsersTitles.push_back(titles);
         //this->size++;
@@ -210,17 +207,17 @@ void Widget::FormTable() noexcept
         userInfo info;
         for (std::size_t inner_index = 0; inner_index < allUsersTitles[index].size(); inner_index++ )
         {
-            this->allTitles.push_back(std::get<0>(allUsersTitles[index][inner_index] ));
+            this->allTitles.push_back(allUsersTitles[index][inner_index].title);
             bool b = 0;
             std::size_t innerFoundIndex;
             for (std::size_t index_ = 0; index_ < index; index_++ )
             {
                 for (std::size_t inner_index_ = 0; inner_index_ < allUsersTitles[index_].size(); inner_index_++ )
                 {
-                    if( std::get<0>(allUsersTitles[index][inner_index]) == std::get<0>(allUsersTitles[index_][inner_index_])) 
+                    if(allUsersTitles[index][inner_index].title == allUsersTitles[index_][inner_index_].title) 
                     {
                         b = true;
-                        innerFoundIndex = std::get<1>(std::get<1>(allUsersTitles[index_][inner_index_]));
+                        innerFoundIndex = allUsersTitles[index_][inner_index_].position;
                         goto skip;
                     }
                 }
@@ -229,31 +226,31 @@ void Widget::FormTable() noexcept
             if(false == b)
             {
                 this->ptableWidget->insertRow(this->ptableWidget->rowCount());
-                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 1,new QTableWidgetItem(                               std::get<0>(allUsersTitles[index][inner_index] ).c_str()));
-                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 2,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))      )));
-                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 3,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20   )));
-                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 4,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.   )));
-                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 5,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.  )));
-                std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) = this->ptableWidget->rowCount();
+                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 1,new QTableWidgetItem(                  allUsersTitles[index][inner_index].title.c_str()));
+                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 2,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes    )));
+                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 3,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes*20 )));
+                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 4,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes/3. )));
+                this->ptableWidget->setItem  (this->ptableWidget->rowCount() - 1, 6*index + 5,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes/72.)));
+                allUsersTitles[index][inner_index].position = this->ptableWidget->rowCount();
                 QJsonObject obj;
-                obj["title"] = std::get<0>(allUsersTitles[index][inner_index] ).c_str() ;
-                obj["episodes"] = QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] )));
+                obj["title"] = allUsersTitles[index][inner_index].title.c_str() ;
+                obj["episodes"] = QString::number(allUsersTitles[index][inner_index].episodes);
                 json_array.push_back(obj);
             }
             else
             {
-                std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) = innerFoundIndex;
-                this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 1,new QTableWidgetItem(                               std::get<0>(allUsersTitles[index][inner_index] ).c_str()));
-                this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 2,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))      )));
-                this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 3,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20   )));
-                this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 4,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.   )));
-                this->ptableWidget->setItem(std::get<1>( std::get<1>(allUsersTitles[index][inner_index] )) - 1, 6*index + 5,new QTableWidgetItem( QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.  )));
+                allUsersTitles[index][inner_index].position = innerFoundIndex;
+                this->ptableWidget->setItem  (innerFoundIndex - 1, 6*index + 1,new QTableWidgetItem(                  allUsersTitles[index][inner_index].title.c_str()));
+                this->ptableWidget->setItem  (innerFoundIndex - 1, 6*index + 2,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes    )));
+                this->ptableWidget->setItem  (innerFoundIndex - 1, 6*index + 3,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes*20 )));
+                this->ptableWidget->setItem  (innerFoundIndex - 1, 6*index + 4,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes/3. )));
+                this->ptableWidget->setItem  (innerFoundIndex - 1, 6*index + 5,new QTableWidgetItem( QString::number( allUsersTitles[index][inner_index].episodes/72.)));
                 QJsonObject obj;
-                obj["title"] = std::get<0>(allUsersTitles[index][inner_index] ).c_str() ;
-                obj["episodes"] = QString::number( std::get<0>( std::get<1>(allUsersTitles[index][inner_index] )));
+                obj["title"] = allUsersTitles[index][inner_index].title.c_str() ;
+                obj["episodes"] = QString::number(allUsersTitles[index][inner_index].episodes);
                 json_array.push_back(obj);
             }
-            info.episode += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ));
+            info.episode += allUsersTitles[index][inner_index].episodes;
             //info.minuts  += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))*20;
             //info.hours   += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/3.;
             //info.days    += std::get<0>( std::get<1>(allUsersTitles[index][inner_index] ))/72.;
