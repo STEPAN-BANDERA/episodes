@@ -37,7 +37,7 @@ Widget::Widget(QWidget *parent)
     //connect(pcallOpenLink,     SIGNAL (released()),this, SLOT (on_pushButton_2_clicked()));
     connect(pOpenJsonFile,     SIGNAL (released()),this, SLOT (  OpenFile()));
     
-    //std::atomic_init(&size, 0);
+    std::atomic_init(&size, 0);
 }
 
 Widget::~Widget()
@@ -47,110 +47,114 @@ Widget::~Widget()
 
 void Widget::do_work(const std::string &e) noexcept
 {
-        //std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> titles;
-        std::vector<Widget::TitleInfo> titles;
+    qDebug(((std::string("thread starts") + e).c_str()));
+    //std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> titles;
+    std::vector<Widget::TitleInfo> titles;
+    QNetworkAccessManager manager;
+    QNetworkRequest request(QUrl(std::string ("https://yummyanime.club/users/id" + e + "?tab=watched" ).c_str()));
+    QNetworkReply *reply(manager.get(request));
+    QEventLoop loop;
+    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+    const QByteArray arr = reply->readAll();
+    std::string str = arr.toStdString();
+    const std::string str_copy= str,sub_str;
+    std::vector<std::size_t> vct;
+    std::size_t pos_start = 0;
+    while ( (pos_start = str.find("data-typeid=")) != std::string::npos){
+        vct.push_back(pos_start + 16);
+        str.erase ( str.begin() , str.begin() + 16 + pos_start);     //
+    }
+    std::size_t index = 0 ;
+    std::vector <std::string> vct2;
+    for (const auto & e : vct) {
+        std::size_t size_ = 0;
+        for( std::size_t inner_index = 0 ; (inner_index <= index) && (index < vct.size()); ++inner_index){
+            size_ += vct[inner_index];
+        }
+        ++index;
+        if ((pos_start = str_copy.find("/", size_ )) != std::string::npos)
+        {
+            const std::size_t inner_size = str_copy.find("\"", pos_start);
+            vct2.push_back( str_copy.substr( pos_start , inner_size - pos_start ));
+        }
+    }
+    std::size_t _size = 0;
+    for (const auto & e : vct2){
+        
+        //            std::string image_path = "";
+        //            pos_start = str.find("<img src=\"/img/posters/");
+        
+        //            while ( isdigit(str[pos_start + 23]))
+        //            {
+        //                image_path += str[pos_start + 23];
+        //                ++pos_start;
+        
+        //            }
+        //            image_path = ("https://yummyanime.club/img/posters/" + image_path + ".jpg");
+        //            qDebug() << image_path.c_str();
+        
+        
+        
+        
         QNetworkAccessManager manager;
-        QNetworkRequest request(QUrl(std::string ("https://yummyanime.club/users/id" + e + "?tab=watched" ).c_str()));
+        QNetworkRequest request(QUrl( (std::string("https://yummyanime.club") + e).c_str()));
         QNetworkReply *reply(manager.get(request));
         QEventLoop loop;
         QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
         const QByteArray arr = reply->readAll();
-        std::string str = arr.toStdString();
-        const std::string str_copy= str,sub_str;
-        std::vector<std::size_t> vct;
-        std::size_t pos_start = 0;
-        while ( (pos_start = str.find("data-typeid=")) != std::string::npos){
-            vct.push_back(pos_start + 16);
-            str.erase ( str.begin() , str.begin() + 16 + pos_start);     //
-        }
-        std::size_t index = 0 ;
-        std::vector <std::string> vct2;
-        for (const auto & e : vct) {
-            std::size_t size_ = 0;
-            for( std::size_t inner_index = 0 ; (inner_index <= index) && (index < vct.size()); ++inner_index){
-                size_ += vct[inner_index];
+        const std::string str= arr.toStdString();
+        const std::size_t pos_start2 = str.find("<h1>",0);
+        const std::size_t end_start = str.find("</h1>",pos_start2 + 4);
+        std::string sub_str = str.substr(pos_start2 + 4, end_start - pos_start2);
+        sub_str.erase(0, 20);
+        std::size_t index=0;
+        while(true)
+        {
+            if(index == sub_str.size()) break;
+            if (sub_str[index] == sub_str[index + 1] ) 
+            {
+                sub_str.erase(index, sub_str.size() - index);
+                break;
             }
             ++index;
-            if ((pos_start = str_copy.find("/", size_ )) != std::string::npos)
-            {
-                const std::size_t inner_size = str_copy.find("\"", pos_start);
-                vct2.push_back( str_copy.substr( pos_start , inner_size - pos_start ));
-            }
         }
-        std::size_t _size = 0;
-        for (const auto & e : vct2){
-        
-//            std::string image_path = "";
-//            pos_start = str.find("<img src=\"/img/posters/");
-            
-//            while ( isdigit(str[pos_start + 23]))
-//            {
-//                image_path += str[pos_start + 23];
-//                ++pos_start;
-                
-//            }
-//            image_path = ("https://yummyanime.club/img/posters/" + image_path + ".jpg");
-//            qDebug() << image_path.c_str();
-        
-        
-        
-        
-            QNetworkAccessManager manager;
-            QNetworkRequest request(QUrl( (std::string("https://yummyanime.club") + e).c_str()));
-            QNetworkReply *reply(manager.get(request));
-            QEventLoop loop;
-            QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-            loop.exec();
-            const QByteArray arr = reply->readAll();
-            const std::string str= arr.toStdString();
-            const std::size_t pos_start2 = str.find("<h1>",0);
-            const std::size_t end_start = str.find("</h1>",pos_start2 + 4);
-            std::string sub_str = str.substr(pos_start2 + 4, end_start - pos_start2);
-            sub_str.erase(0, 20);
-            std::size_t index=0;
-            while(true)
-            {
-                if(index == sub_str.size()) break;
-                if (sub_str[index] == sub_str[index + 1] ) 
-                {
-                    sub_str.erase(index, sub_str.size() - index);
-                    break;
-                }
-                ++index;
-            }
-            const std::size_t pos_start = str.find("Серии:");
-            std::string g;
-            if (std::isdigit(str[pos_start + 21]))
-            {
-                g = "   ";
-                g[1] = str[pos_start + 20];
-                g[2] = str[pos_start + 21];
-            }
-            else if (std::isdigit(str[pos_start + 20]))
-            {
-                g = "  ";
-                g[1] = str[pos_start + 20];
-            }
-            else g = " ";
-            g[0] = str[pos_start + 19];
-            _size  += std::atoi(g.c_str());
-            
-            titles.push_back( {sub_str,std::atoi(g.c_str()),0 });
+        const std::size_t pos_start = str.find("Серии:");
+        std::string g;
+        if (std::isdigit(str[pos_start + 21]))
+        {
+            g = "   ";
+            g[1] = str[pos_start + 20];
+            g[2] = str[pos_start + 21];
         }
-        this->mux.lock();
-        this->allUsersTitles.push_back(titles);
-        //this->size++;
-        this->mux.unlock();
-        qDebug(((std::string("thread ends") + e).c_str()));
+        else if (std::isdigit(str[pos_start + 20]))
+        {
+            g = "  ";
+            g[1] = str[pos_start + 20];
+        }
+        else g = " ";
+        g[0] = str[pos_start + 19];
+        _size  += std::atoi(g.c_str());
+        
+        titles.push_back( {sub_str,std::atoi(g.c_str()),0 });
+    }
+    this->mux.lock();
+    this->allUsersTitles.push_back(titles);
+    this->size++;
+    this->mux.unlock();
+    qDebug(((std::string("thread ends") + e).c_str()));
 }
 
 
 
 void Widget::GetInput()
 {
+
     Dialog d(this);
     if(d.exec() == QDialog::Rejected) return;
+    this->ptableWidget->setRowCount(0);
+    this->size.store(0);
     this->tp = std::chrono::system_clock::now();
     const QString text2 = d.getText();
     qDebug((text2.toStdString()).c_str());
@@ -163,28 +167,28 @@ void Widget::GetInput()
     }
     //if ("" != text ) idVector.push_back(text);
     //std::sort(idVector.begin(),idVector.end());
-    //for(const auto & e : idVector)
-    //{
-        //this->pidComboBoxList->addItem(QString::fromStdString("https://yummyanime.club/users/id" +e));
-        //std::thread(&Widget::do_work,this,std::ref(e)).detach();
-        //auto a = std::async(&Widget::do_work, this, std::ref(e));
-    //}
-    
-    boost::asio::thread_pool pool(15);
     
     for(const auto & e : idVector)
     {
-        boost::asio::post(pool, [this,&e](){this->do_work(e);} );
+        //this->pidComboBoxList->addItem(QString::fromStdString("https://yummyanime.club/users/id" +e));
+        std::thread(&Widget::do_work,this,std::ref(e)).detach();
+        //auto a = std::async(&Widget::do_work, this, std::ref(e));
     }
-    pool.join();
+    while (this->size.load() != this->idVector.size()) std::this_thread::yield();
+
+//    boost::asio::thread_pool pool(8);
+    
+//    for(const auto & e : idVector)
+//    {
+//        boost::asio::post(pool, [this,&e](){this->do_work(e);} );
+//    }
+//    pool.join();
     this->FormTable();
     this->tp2 = std::chrono::system_clock::now();
     const std::chrono::duration<double> diff = tp2 - tp;
+    this->allUsersTitles.clear();
     qDebug( (std::to_string( diff.count() ).c_str() ));
     //this->FormLogFiles();
-    //while (this->size.load() != this->idVector.size()) std::this_thread::yield();
-    
-    
 }
 
 void Widget::FormTable() noexcept
