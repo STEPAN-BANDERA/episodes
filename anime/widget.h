@@ -12,14 +12,7 @@
 #include <QScrollBar>
 #include <QAbstractItemModel>
 #include <QAbstractTableModel>
-#include <algorithm>
-#include <mutex>
-#include <atomic>
-#include <chrono>
-#include <numeric>
-#include <string>
-#include <vector>
-#include <boost/asio.hpp>
+//#include <boost/asio.hpp>
 #include <QFileDialog>
 #include <QTextStream>
 #include <QFile>
@@ -27,7 +20,16 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
+#include <QBarSet>
 #include <type_traits>
+#include <algorithm>
+#include <mutex>
+#include <atomic>
+#include <chrono>
+#include <numeric>
+#include <string>
+#include <vector>
+#include <regex>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -50,8 +52,10 @@ private:
      struct TitleInfo
      {
          std::string title;
+         std::string studio;
          std::size_t episodes;
          std::size_t position;
+         std::size_t rate;
      };
      struct userInfo
      {
@@ -61,17 +65,21 @@ private:
          std::size_t minuts = 0;
          std::size_t episode = 0;
      };
+     struct userIdInfo
+     {
+         std::vector<TitleInfo> titleInfo;
+         std::string nickname;
+     };
      QTableWidget * ptableWidget;
      QComboBox *pidComboBoxList;
      SortComboBox * sortComboBox;
      QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile;
      QHBoxLayout * pHorizontalbxLayout;
      QVBoxLayout * pVerticallbxLayout;
-     //std::vector<std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>>> allUsersTitles;
-     std::vector<std::vector<TitleInfo>> allUsersTitles;
+     std::vector<userIdInfo> allUsersTitles;
      std::mutex mux;
      std::atomic<std::size_t> size;
-     std::vector <std::string> idVector , allTitles, allImages;
+     std::vector<std::string> idVector , allTitles, allImages;
      void do_work(const std::string &e) noexcept; 
      void FormTable() noexcept; 
      //void FormLogFiles() noexcept; 
