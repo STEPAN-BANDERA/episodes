@@ -13,8 +13,6 @@ Dialog::~Dialog()
     delete ui;
 }
 
-
-
 void Dialog::on_buttonBox_accepted()
 {
     accept();

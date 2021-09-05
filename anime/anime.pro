@@ -1,4 +1,4 @@
-QT       += core gui network widgets
+QT       += core gui network widgets charts
 
 CONFIG += c++14
 
@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     dialog.cpp \
+    form.cpp \
     main.cpp \
     sortcombobox.cpp \
     tablesortmodel.cpp \
@@ -25,12 +26,14 @@ SOURCES += \
 
 HEADERS += \
     dialog.h \
+    form.h \
     sortcombobox.h \
     tablesortmodel.h \
     widget.h
 
 FORMS += \
     dialog.ui \
+    form.ui \
     widget.ui
 
 # Default rules for deployment.

@@ -1,6 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
-#include "dialog.h"
+
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -16,18 +16,33 @@ Widget::Widget(QWidget *parent)
 
     this->pcallOpenLink  = new QPushButton("Open choosed profile");
     this->pcallDialogWindow = new QPushButton("Gеt input ids");
+    this->pShowChartStudio = new QPushButton("Show Studio Charts");
+    this->pShowChartGenre = new QPushButton("Show Genre Charts");
     this->pOpenJsonFile = new QPushButton("Add Data From File");
     
 
     this->pHorizontalbxLayout = new QHBoxLayout;
+
+
+    this->pHorizontalButtonsLayout = new QHBoxLayout;
+    this->pHorizontalButtonsLayout ->addWidget(this->pShowChartStudio);
+    this->pHorizontalButtonsLayout ->addWidget(this->pShowChartGenre);
     this->pVerticallbxLayout = new QVBoxLayout;
+
+
+
     this->pHorizontalbxLayout->addWidget(this->sortComboBox, 3);
 
     this->pHorizontalbxLayout->addWidget(this->pidComboBoxList, 3);
     this->pHorizontalbxLayout->addWidget(this->pcallOpenLink, 2);
     this->pHorizontalbxLayout->addWidget(this->pcallDialogWindow, 2);
     this->pHorizontalbxLayout->addWidget(this->pOpenJsonFile, 2);
+
     this->pVerticallbxLayout ->addWidget(this->ptableWidget);
+
+
+
+    this->pVerticallbxLayout ->addLayout(this->pHorizontalButtonsLayout);
     this->pVerticallbxLayout ->addLayout(this->pHorizontalbxLayout); 
     this->setWindowTitle("Check profile");
 
@@ -36,6 +51,7 @@ Widget::Widget(QWidget *parent)
     connect(pcallDialogWindow, SIGNAL (released()),this, SLOT (  GetInput()));
     //connect(pcallOpenLink,     SIGNAL (released()),this, SLOT (on_pushButton_2_clicked()));
     connect(pOpenJsonFile,     SIGNAL (released()),this, SLOT (  OpenFile()));
+    connect(pShowChartStudio,  SIGNAL (released()),this, SLOT ( ShowStudioCharts()));
     
     std::atomic_init(&size, 0);
 }
@@ -65,14 +81,8 @@ void Widget::do_work(const std::string &e) noexcept
     std::size_t pos_start_nickname = str.find("Профиль ");
 
     std::size_t pos_end_nickname = str.find("</title>", pos_start_nickname);
-
-    //std::string nickname = str.substr(pos_start_nickname + 8,pos_end_nickname - pos_start_nickname - 8);
-    userIdInfo.nickname = str.substr(pos_start_nickname + 12,pos_end_nickname - pos_start_nickname - 12);
-    //qDebug((rate.c_str()));
-    //qDebug((std::to_string(pos_start_studio_2).c_str()));
-    //qDebug((std::to_string(pos_end_studio).c_str()));
-    //qDebug((std::to_string(pos_end_studio - pos_start_studio_2).c_str()));
-    //qDebug((nickname.c_str()));
+    userIdInfo.nickname = str.substr(pos_start_nickname + 14,pos_end_nickname - pos_start_nickname - 14);
+    userIdInfo.id = e;
 
 
 
@@ -318,6 +328,7 @@ void Widget::FormTable() noexcept
     this->ptableWidget->insertRow(0);
     for (std::size_t var = 0; var < this->userInfoVector.size(); ++var) {
         this->ptableWidget->setItem(0, 8*var    ,new QTableWidgetItem( QString::fromStdString( allUsersTitles[var].nickname  )));
+        this->ptableWidget->setItem(1, 8*var    ,new QTableWidgetItem( QString::fromStdString( allUsersTitles[var].id  )));
         this->ptableWidget->setItem(0, 8*var + 1,new QTableWidgetItem( QString::fromStdString( "Всего: " +std::to_string(this->userInfoVector[var].titles_) )));
         this->ptableWidget->setItem(0, 8*var + 3,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode    )));
         this->ptableWidget->setItem(0, 8*var + 4,new QTableWidgetItem( QString::number( this->userInfoVector[var].episode*20 )));
@@ -328,6 +339,12 @@ void Widget::FormTable() noexcept
     //for (const auto & e : this->idVector) this->sortComboBox->addItem(QString::fromStdString( ("https://yummyanime.club/users/id" + e)  ));
 }
 
+void Widget::ShowStudioCharts() noexcept
+{
+    this->pForm = new Form();
+
+    pForm->show();
+}
 
 //void Widget::FormLogFiles() noexcept
 //{

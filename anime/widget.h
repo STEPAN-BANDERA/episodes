@@ -1,6 +1,9 @@
-#ifndef WIDGET_H
+﻿#ifndef WIDGET_H
 #define WIDGET_H
 #include <sortcombobox.h>
+#include "dialog.h"
+#include "form.h"
+
 #include <QWidget>
 #include <QApplication>
 #include <QCoreApplication>
@@ -20,7 +23,9 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
+#include <QChar>
 #include <QBarSet>
+
 #include <type_traits>
 #include <algorithm>
 #include <mutex>
@@ -45,7 +50,7 @@ public:
 private slots:
      void GetInput();
      void OpenFile();
-
+     void ShowStudioCharts() noexcept;
      //void on_pushButton_2_clicked();
      
 private:
@@ -69,12 +74,14 @@ private:
      {
          std::vector<TitleInfo> titleInfo;
          std::string nickname;
+         std::string id;
      };
+     Form * pForm;
      QTableWidget * ptableWidget;
      QComboBox *pidComboBoxList;
      SortComboBox * sortComboBox;
-     QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile;
-     QHBoxLayout * pHorizontalbxLayout;
+     QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowChartGenre;
+     QHBoxLayout * pHorizontalbxLayout, *pHorizontalButtonsLayout;
      QVBoxLayout * pVerticallbxLayout;
      std::vector<userIdInfo> allUsersTitles;
      std::mutex mux;
@@ -82,6 +89,7 @@ private:
      std::vector<std::string> idVector , allTitles, allImages;
      void do_work(const std::string &e) noexcept; 
      void FormTable() noexcept; 
+
      //void FormLogFiles() noexcept; 
      //void SaveFile( const std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * v,  std::string & str) noexcept;
      
