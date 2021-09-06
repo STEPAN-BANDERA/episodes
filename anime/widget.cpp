@@ -182,7 +182,10 @@ void Widget::do_work(const std::string &e) noexcept
         std::size_t pos_start_studio = str.find("Студия:");
         pos_start_studio = str.find("<a href=\"/catalog/studio/", pos_start_studio);
         const std::size_t pos_end_studio = str.find("\">", pos_start_studio);
-        const std::string studio = str.substr(pos_start_studio + 25, pos_end_studio - pos_start_studio - 25);
+        std::string studio = "";
+        if(std::string::npos != pos_end_studio){
+            studio = str.substr(pos_start_studio + 25, pos_end_studio - pos_start_studio - 25);
+        }
         //titles.push_back( {sub_str, studio,static_cast<std::size_t>(std::atoi(g.c_str())),0,0 });
         userIdInfo.titleInfo.push_back({sub_str, studio,static_cast<std::size_t>(std::atoi(g.c_str())),0,0 });
     }
@@ -268,6 +271,7 @@ void Widget::FormTable() noexcept
         userInfo info;
         for (std::size_t inner_index = 0; inner_index < allUsersTitles[index].titleInfo.size(); ++inner_index )
         {
+            ++info.studiosStats[allUsersTitles[index].titleInfo[inner_index].studio];
             bool b = 0;
             std::size_t innerFoundIndex;
             for (std::size_t index_ = 0; index_ < index; ++index_ )
@@ -323,6 +327,7 @@ void Widget::FormTable() noexcept
         output.close();
         info.titles_ = allUsersTitles[index].titleInfo.size();
         this->userInfoVector.push_back(info);
+
     }
     //this->ptableWidget->setSortingEnabled(true);
     this->ptableWidget->insertRow(0);
@@ -342,7 +347,7 @@ void Widget::FormTable() noexcept
 void Widget::ShowStudioCharts() noexcept
 {
     this->pForm = new Form();
-
+    //pForm->provideData(this->userInfoVector,);
     pForm->show();
 }
 

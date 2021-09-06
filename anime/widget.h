@@ -25,6 +25,8 @@
 #include <QJsonArray>
 #include <QChar>
 #include <QBarSet>
+#include <QBarSeries>
+#include <QPieSeries>
 
 #include <type_traits>
 #include <algorithm>
@@ -47,6 +49,30 @@ class Widget : public QWidget
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
+
+    struct TitleInfo
+    {
+        std::string title;
+        std::string studio;
+        std::size_t episodes;
+        std::size_t position;
+        std::size_t rate;
+    };
+    struct userInfo
+    {
+        std::map<std::string, std::size_t> studiosStats;
+        double hours = 0.;
+        double days = 0.;
+        std::size_t titles_ = 0;
+        std::size_t minuts = 0;
+        std::size_t episode = 0;
+    };
+    struct userIdInfo
+    {
+        std::vector<TitleInfo> titleInfo;
+        std::string nickname;
+        std::string id;
+    };
 private slots:
      void GetInput();
      void OpenFile();
@@ -54,28 +80,7 @@ private slots:
      //void on_pushButton_2_clicked();
      
 private:
-     struct TitleInfo
-     {
-         std::string title;
-         std::string studio;
-         std::size_t episodes;
-         std::size_t position;
-         std::size_t rate;
-     };
-     struct userInfo
-     {
-         double hours = 0.;
-         double days = 0.;
-         std::size_t titles_ = 0;
-         std::size_t minuts = 0;
-         std::size_t episode = 0;
-     };
-     struct userIdInfo
-     {
-         std::vector<TitleInfo> titleInfo;
-         std::string nickname;
-         std::string id;
-     };
+
      Form * pForm;
      QTableWidget * ptableWidget;
      QComboBox *pidComboBoxList;

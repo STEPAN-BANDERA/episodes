@@ -4,6 +4,8 @@
 
 int main(int argc, char *argv[])
 {
+    SetConsoleCP(866);
+    SetConsoleOutputCP(866);
     QApplication a(argc, argv);
     Widget w;
     w.show();

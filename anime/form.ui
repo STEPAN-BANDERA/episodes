@@ -13,17 +13,14 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QGraphicsView" name="graphicsView">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>30</y>
-     <width>901</width>
-     <height>511</height>
+     <x>190</x>
+     <y>40</y>
+     <width>681</width>
+     <height>491</height>
     </rect>
-   </property>
-   <property name="text">
-    <string>PushButton</string>
    </property>
   </widget>
  </widget>
