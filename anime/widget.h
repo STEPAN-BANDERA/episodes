@@ -66,13 +66,16 @@ public:
         std::size_t titles_ = 0;
         std::size_t minuts = 0;
         std::size_t episode = 0;
-    };
-    struct userIdInfo
-    {
         std::vector<TitleInfo> titleInfo;
         std::string nickname;
         std::string id;
     };
+//    struct userIdInfo
+//    {
+//        std::vector<TitleInfo> titleInfo;
+//        std::string nickname;
+//        std::string id;
+//    };
 private slots:
      void GetInput();
      void OpenFile();
@@ -88,7 +91,7 @@ private:
      QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowChartGenre;
      QHBoxLayout * pHorizontalbxLayout, *pHorizontalButtonsLayout;
      QVBoxLayout * pVerticallbxLayout;
-     std::vector<userIdInfo> allUsersTitles;
+//     std::vector<userIdInfo> allUsersTitles;
      std::mutex mux;
      std::atomic<std::size_t> size;
      std::vector<std::string> idVector , allTitles, allImages;

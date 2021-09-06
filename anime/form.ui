@@ -13,17 +13,24 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QGraphicsView" name="graphicsView">
+  <widget class="QChartView" name="graphicsView">
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>40</y>
-     <width>681</width>
-     <height>491</height>
+     <y>90</y>
+     <width>561</width>
+     <height>371</height>
     </rect>
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header>QtCharts</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

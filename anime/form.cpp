@@ -13,36 +13,56 @@ Form::~Form()
     delete ui;
 }
 
-void Form::provideData(std::map<std::string, size_t> studiosStats, std::string nickname) noexcept
+void Form::provideStudioData(std::map<std::string, size_t> *studiosStats, const std::string &nickname) noexcept
 {
-    //    QBarSeries *series = new QBarSeries();
-    //    for (const auto & e : this->userInfoVector ){
-    //        QBarSet *set0 = new QBarSet("1");
-    //        for ( const auto & a : e.studiosStats){
-    //            *set0 << a.second;
-    //        }
+    this->stats.push_back(studiosStats);
+    this->nicknames.push_back(nickname);
+}
 
-    //        //qDebug( (e.first.c_str() + std::to_string(e.second)).c_str());
-    //    }
-    //![1]
-        QPieSeries *series = new QPieSeries();
-        series->append("Jane", 1);
-        series->append("Joe", 2);
-        series->append("Andy", 3);
-        series->append("Barbara", 4);
-        series->append("Axel", 5);
-    //![1]
+void Form::processStudioStats() noexcept
+{
+    srand(time(0));
+    QPieSeries *series = new QPieSeries();
 
-    //![3]
-        QChart *chart = new QChart();
-        chart->addSeries(series);
-    //![3]
+//    for (const auto & e : this->stats ){
+//        //QBarSet *set0 = new QBarSet("1");
+//        for ( const auto & a : *e){
+//            //*set0 << a.second;
+//            qDebug( (a.first + " " + std::to_string(a.second)).c_str());
+//            }
+//    }
 
-    //![4]
-        QChartView *chartView = new QChartView(chart);
+    for ( const auto & a : *this->stats[0]){
+        QPieSlice * slice = new QPieSlice();
+        slice->setColor(QColor(rand()%255, rand()%255, rand()%255));
+        slice->setValue(a.second);
+        slice->setLabel(a.first.c_str());
+        series->append(slice);
+       }
 
-        ui->graphicsView =chartView;
-          ui->graphicsView->show();
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle(QString::fromStdString(this->nicknames[0]));
+
+    ui->graphicsView = new QChartView(chart);
+        //![4]
+    //ui->stackedWidget->  =chartView;
+    ui->graphicsView->show();
+
+//    std::vector<QWidget *> widgetVec;
+//    QStackedWidget *stackedWidget = new QStackedWidget;
+
+//    for(std::size_t index = 0; index < this->stats.size(); ++index){
+//        QWidget *w = new QWidget;
+//        w->ad
+//        widgetVec.push_back(w);
+//        stackedWidget->addWidget(widgetVec[index]);
+//    }
+
+//    QVBoxLayout *layout = new QVBoxLayout;
+//    layout->addWidget(stackedWidget, 0);
+//    this->setLayout(layout);
+
 }
 
 
