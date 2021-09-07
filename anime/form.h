@@ -10,6 +10,8 @@
 #include <map>
 #include <QStackedWidget>
 #include <QtGlobal>
+#include <QRectF>
+#include <QRect>
 
 namespace Ui {
 class Form;

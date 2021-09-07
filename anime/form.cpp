@@ -41,12 +41,25 @@ void Form::processStudioStats() noexcept
        }
 
     QChart *chart = new QChart();
+    chart->setAnimationOptions(QChart::AnimationOption::AllAnimations);
     chart->addSeries(series);
-    chart->setTitle(QString::fromStdString(this->nicknames[0]));
 
+    //chart->setPlotArea(QRectF(200,0,1400,1100));
+
+    //chart->legend()->detachFromChart();
+    chart->legend()->setBackgroundVisible(true);
+    chart->legend()->setBrush(QBrush(QColor(128, 128, 128, 128)));
+    chart->legend()->setPen(QPen(QColor(192, 192, 192, 192)));
+    //chart->legend()->setGeometry(QRectF(20,20,200,1000));
+    chart->setTitle(QString::fromStdString(this->nicknames[0]));
+    this->setWindowTitle(QString::fromStdString(this->nicknames[0]));
+    chart->legend()->setAlignment(Qt::AlignLeft);
+
+    //chart->legend()->attachToChart();
     ui->graphicsView = new QChartView(chart);
         //![4]
     //ui->stackedWidget->  =chartView;
+
     ui->graphicsView->show();
 
 //    std::vector<QWidget *> widgetVec;
