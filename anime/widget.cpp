@@ -53,7 +53,8 @@ Widget::Widget(QWidget *parent)
     connect(pOpenJsonFile,     SIGNAL (released()),this, SLOT (  OpenFile()));
     connect(pShowChartStudio,  SIGNAL (released()),this, SLOT ( ShowStudioCharts()));
     
-    std::atomic_init(&size, 0);
+    std::atomic_init(&size, (uint32_t)0);
+
 }
 
 Widget::~Widget()
@@ -134,8 +135,11 @@ void Widget::do_work(const std::string &e) noexcept
         //            }
         //            image_path = ("https://yummyanime.club/img/posters/" + image_path + ".jpg");
         //            qDebug() << image_path.c_str();
-        
-        
+
+        //tbb::concurrent_map <int,int>::accse
+
+
+        this->map.insert( this->map.begin(), {});
         
         
         QNetworkAccessManager manager;
@@ -245,6 +249,11 @@ void Widget::GetInput()
     this->FormTable();
     this->tp2 = std::chrono::system_clock::now();
     const std::chrono::duration<double> diff = tp2 - tp;
+
+    for(const auto & a : this->map)
+    {
+        qDebug( ( static_cast<std::string>(a)).c_str());
+    }
     qDebug( (std::to_string( diff.count() ).c_str() ));
     //this->FormLogFiles();
 }
@@ -453,3 +462,8 @@ void Widget::OpenFile()
 //{
 //    QDesktopServices::openUrl(QUrl(QString::fromStdString((this->pidComboBoxList->currentText().toStdString()))));
 //}
+
+bool operator < ( const Widget::TitleInfo &first , const Widget::TitleInfo &second )
+{
+  return first.title < second.title;
+}

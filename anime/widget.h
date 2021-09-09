@@ -38,6 +38,17 @@
 #include <vector>
 #include <regex>
 
+
+
+//#ifndef Q_MOC_RUN
+#define __TBB_NO_IMPLICIT_LINKAGE 1
+#define __TBBMALLOC_NO_IMPLICIT_LINKAGE 1
+#include "oneapi\tbb.h"
+#include "tbb/concurrent_hash_map.h"
+#include "tbb/blocked_range.h"
+#include "tbb/parallel_for.h"
+//#endif
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
 QT_END_NAMESPACE
@@ -50,6 +61,7 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
+
     struct TitleInfo
     {
         std::string title;
@@ -57,7 +69,15 @@ public:
         std::size_t episodes;
         std::size_t position;
         std::size_t rate;
+
+
+        operator std::string() const {
+            return title + std::to_string(rate) + std::to_string(episodes) + std::to_string(position) + studio;
+        }
     };
+
+
+
     struct userInfo
     {
         std::map<std::string, std::size_t> studiosStats;
@@ -83,7 +103,7 @@ private slots:
      //void on_pushButton_2_clicked();
      
 private:
-
+     tbb::concurrent_set <Widget::TitleInfo> map;
      Form * pForm;
      QTableWidget * ptableWidget;
      QComboBox *pidComboBoxList;
@@ -93,7 +113,7 @@ private:
      QVBoxLayout * pVerticallbxLayout;
 //     std::vector<userIdInfo> allUsersTitles;
      std::mutex mux;
-     std::atomic<std::size_t> size;
+     std::atomic<uint32_t> size;
      std::vector<std::string> idVector , allTitles, allImages;
      void do_work(const std::string &e) noexcept; 
      void FormTable() noexcept; 
@@ -105,6 +125,9 @@ private:
      Ui::Widget *ui;
      std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;
 };
+
+
+
 #endif // WIDGET_H
 
     /*
