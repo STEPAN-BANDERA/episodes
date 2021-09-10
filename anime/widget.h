@@ -60,8 +60,6 @@ class Widget : public QWidget
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
-
-
     struct TitleInfo
     {
         std::string title;
@@ -69,15 +67,10 @@ public:
         std::size_t episodes;
         std::size_t position;
         std::size_t rate;
-
-
         operator std::string() const {
-            return title + std::to_string(rate) + std::to_string(episodes) + std::to_string(position) + studio;
+            return title + " " + std::to_string(rate)+ " " + std::to_string(episodes) + " " + std::to_string(position) + " " + studio;
         }
     };
-
-
-
     struct userInfo
     {
         std::map<std::string, std::size_t> studiosStats;
@@ -90,12 +83,6 @@ public:
         std::string nickname;
         std::string id;
     };
-//    struct userIdInfo
-//    {
-//        std::vector<TitleInfo> titleInfo;
-//        std::string nickname;
-//        std::string id;
-//    };
 private slots:
      void GetInput();
      void OpenFile();
@@ -103,7 +90,7 @@ private slots:
      //void on_pushButton_2_clicked();
      
 private:
-     tbb::concurrent_set <Widget::TitleInfo> map;
+     tbb::concurrent_map <std::string, Widget::TitleInfo> map;
      Form * pForm;
      QTableWidget * ptableWidget;
      QComboBox *pidComboBoxList;
@@ -111,13 +98,11 @@ private:
      QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowChartGenre;
      QHBoxLayout * pHorizontalbxLayout, *pHorizontalButtonsLayout;
      QVBoxLayout * pVerticallbxLayout;
-//     std::vector<userIdInfo> allUsersTitles;
      std::mutex mux;
      std::atomic<uint32_t> size;
      std::vector<std::string> idVector , allTitles, allImages;
      void do_work(const std::string &e) noexcept; 
      void FormTable() noexcept; 
-
      //void FormLogFiles() noexcept; 
      //void SaveFile( const std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * v,  std::string & str) noexcept;
      
