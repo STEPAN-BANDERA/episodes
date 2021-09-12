@@ -12,6 +12,7 @@
 #include <QtGlobal>
 #include <QRectF>
 #include <QRect>
+#include "DataTypes.h"
 
 namespace Ui {
 class Form;
@@ -24,11 +25,16 @@ class Form : public QWidget
 public:
     explicit Form(QWidget *parent = nullptr);
     ~Form();
-    void provideStudioData(std::map<std::string, std::size_t> *studiosStats, const std::string &nickname) noexcept;
-    void processStudioStats() noexcept;
+    void provideData(std::map<std::string, StudioInfo> *studiosStats, const std::string &nickname) noexcept;
+    void processData() noexcept;
+private slots:
+    void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
+
 private:
-    std::vector<std::map<std::string, size_t>*>  stats;
-    std::vector<std::string>  nicknames;
+    std::map<std::string, StudioInfo>*  stat;
+    std::string  nickname;
     Ui::Form *ui;
 };
 

@@ -37,7 +37,7 @@
 #include <string>
 #include <vector>
 #include <regex>
-
+#include "DataTypes.h"
 
 
 //#ifndef Q_MOC_RUN
@@ -60,29 +60,7 @@ class Widget : public QWidget
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
-    struct TitleInfo
-    {
-        std::string title;
-        std::string studio;
-        std::size_t episodes;
-        std::size_t position;
-        std::size_t rate;
-        operator std::string() const {
-            return title + " " + std::to_string(rate)+ " " + std::to_string(episodes) + " " + std::to_string(position) + " " + studio;
-        }
-    };
-    struct userInfo
-    {
-        std::map<std::string, std::size_t> studiosStats;
-        double hours = 0.;
-        double days = 0.;
-        std::size_t titles_ = 0;
-        std::size_t minuts = 0;
-        std::size_t episode = 0;
-        std::vector<TitleInfo> titleInfo;
-        std::string nickname;
-        std::string id;
-    };
+
 private slots:
      void GetInput();
      void OpenFile();
@@ -90,7 +68,7 @@ private slots:
      //void on_pushButton_2_clicked();
      
 private:
-     tbb::concurrent_map <std::string, Widget::TitleInfo> map;
+     tbb::concurrent_map <std::string, TitleInfo> map;
      Form * pForm;
      QTableWidget * ptableWidget;
      QComboBox *pidComboBoxList;

@@ -28,6 +28,7 @@ SOURCES += \
     widget.cpp
 
 HEADERS += \
+    DataTypes.h \
     dialog.h \
     form.h \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/include/oneapi/tbb.h \

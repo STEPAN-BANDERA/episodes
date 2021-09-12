@@ -13,36 +13,37 @@ Form::~Form()
     delete ui;
 }
 
-void Form::provideStudioData(std::map<std::string, size_t> *studiosStats, const std::string &nickname) noexcept
+void Form::provideData(std::map<std::string, StudioInfo> *studiosStats, const std::string &nickname) noexcept
 {
-    this->stats.push_back(studiosStats);
-    this->nicknames.push_back(nickname);
+    this->stat = studiosStats;
+    this->nickname = nickname;
 }
 
-void Form::processStudioStats() noexcept
+void Form::processData() noexcept
 {
     srand(time(0));
     QPieSeries *series = new QPieSeries();
-
-//    for (const auto & e : this->stats ){
-//        //QBarSet *set0 = new QBarSet("1");
-//        for ( const auto & a : *e){
-//            //*set0 << a.second;
-//            qDebug( (a.first + " " + std::to_string(a.second)).c_str());
-//            }
-//    }
-
-    for ( const auto & a : *this->stats[0]){
+    QPieSeries *series2 = new QPieSeries();
+    for ( const auto & a : *this->stat){
+        int r = rand()%255, g = rand()%255 , b = rand()%255;
         QPieSlice * slice = new QPieSlice();
-        slice->setColor(QColor(rand()%255, rand()%255, rand()%255));
-        slice->setValue(a.second);
+        slice->setColor(QColor(r,g,b));
+        slice->setValue(a.second.titles);
         slice->setLabel(a.first.c_str());
         series->append(slice);
+
+        QPieSlice * slice2 = new QPieSlice();
+        slice2->setColor(QColor(r, g, b));
+        slice2->setValue(a.second.episodes);
+        slice2->setLabel(a.first.c_str());
+        series2->append(slice2);
        }
 
     QChart *chart = new QChart();
-    chart->setAnimationOptions(QChart::AnimationOption::AllAnimations);
+    QChart *chart2 = new QChart();
+    //chart->setAnimationOptions(QChart::AnimationOption::AllAnimations);
     chart->addSeries(series);
+    chart2->addSeries(series2);
 
     //chart->setPlotArea(QRectF(200,0,1400,1100));
 
@@ -51,32 +52,41 @@ void Form::processStudioStats() noexcept
     chart->legend()->setBrush(QBrush(QColor(128, 128, 128, 128)));
     chart->legend()->setPen(QPen(QColor(192, 192, 192, 192)));
     //chart->legend()->setGeometry(QRectF(20,20,200,1000));
-    chart->setTitle(QString::fromStdString(this->nicknames[0]));
-    this->setWindowTitle(QString::fromStdString(this->nicknames[0]));
+    chart->setTitle(QString::fromStdString(this->nickname));
+    this->setWindowTitle(QString::fromStdString(this->nickname));
     chart->legend()->setAlignment(Qt::AlignLeft);
 
     //chart->legend()->attachToChart();
-    ui->graphicsView = new QChartView(chart);
-        //![4]
-    //ui->stackedWidget->  =chartView;
+    ui->graphicsView->setChart(chart);
 
-    ui->graphicsView->show();
 
-//    std::vector<QWidget *> widgetVec;
-//    QStackedWidget *stackedWidget = new QStackedWidget;
+    //chart2->setAnimationOptions(QChart::AnimationOption::AllAnimations);
 
-//    for(std::size_t index = 0; index < this->stats.size(); ++index){
-//        QWidget *w = new QWidget;
-//        w->ad
-//        widgetVec.push_back(w);
-//        stackedWidget->addWidget(widgetVec[index]);
-//    }
 
-//    QVBoxLayout *layout = new QVBoxLayout;
-//    layout->addWidget(stackedWidget, 0);
-//    this->setLayout(layout);
+    //chart2->setPlotArea(QRectF(200,0,1400,1100));
+
+    //chart2->legend()->detachFromChart();
+    chart2->legend()->setBackgroundVisible(true);
+    chart2->legend()->setBrush(QBrush(QColor(128, 128, 128, 128)));
+    chart2->legend()->setPen(QPen(QColor(192, 192, 192, 192)));
+    //chart2->legend()->setGeometry(QRectF(20,20,200,1000));
+    chart2->setTitle(QString::fromStdString(this->nickname));
+    chart2->legend()->setAlignment(Qt::AlignLeft);
+
+    //chart->legend()->attachToChart();
+    ui->graphicsView_2->setChart(chart2);
+
 
 }
 
 
+void Form::on_pushButton_clicked()
+{
+    this->ui->stackedWidget->setCurrentIndex(1);
+}
 
+
+void Form::on_pushButton_2_clicked()
+{
+    this->ui->stackedWidget->setCurrentIndex(0);
+}

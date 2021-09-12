@@ -65,8 +65,8 @@ Widget::~Widget()
 void Widget::do_work(const std::string &e) noexcept
 {
     qDebug(((std::string("thread starts ") + e).c_str()));
-    std::vector<Widget::TitleInfo> titles;
-    Widget::userInfo userIdInfo;
+    std::vector<TitleInfo> titles;
+    userInfo userIdInfo;
     QNetworkAccessManager manager;
     QNetworkRequest request(QUrl(std::string ("https://yummyanime.club/users/id" + e + "?tab=watched" ).c_str()));
     QNetworkReply *reply(manager.get(request));
@@ -276,7 +276,8 @@ void Widget::FormTable() noexcept
         userInfo info;
         for (std::size_t inner_index = 0; inner_index < userInfoVector[index].titleInfo.size(); ++inner_index )
         {
-            ++userInfoVector[index].studiosStats[userInfoVector[index].titleInfo[inner_index].studio];
+            ++userInfoVector[index].studiosStats[userInfoVector[index].titleInfo[inner_index].studio].titles;
+            userInfoVector[index].studiosStats[userInfoVector[index].titleInfo[inner_index].studio].episodes += userInfoVector[index].titleInfo[inner_index].episodes;
             bool b = 0;
             std::size_t innerFoundIndex;
             for (std::size_t index_ = 0; index_ < index; ++index_ )
@@ -354,11 +355,12 @@ void Widget::ShowStudioCharts() noexcept
 
     for(auto & e : this->userInfoVector){
         Form *pForm = new Form();
-        pForm->provideStudioData(&e.studiosStats, e.nickname);
-        pForm->processStudioStats();
+        pForm->provideData(&e.studiosStats, e.nickname);
+        pForm->processData();
+        pForm->show();
     }
 
-    //pForm->show();
+    //
 
 
 
@@ -460,7 +462,7 @@ void Widget::OpenFile()
 //    QDesktopServices::openUrl(QUrl(QString::fromStdString((this->pidComboBoxList->currentText().toStdString()))));
 //}
 
-bool operator < ( const Widget::TitleInfo &first , const Widget::TitleInfo &second )
+bool operator < ( const TitleInfo &first , const TitleInfo &second )
 {
   return first.title < second.title;
 }
