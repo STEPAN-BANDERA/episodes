@@ -13,69 +13,67 @@ Form::~Form()
     delete ui;
 }
 
-void Form::provideData(std::map<std::string, StudioInfo> *studiosStats, const std::string &nickname) noexcept
+void Form::provideData(std::map<std::string, StudioInfo> *studiosStats, std::map<std::string, std::size_t> *genresStats, const std::string &nickname) noexcept
 {
     this->stat = studiosStats;
     this->nickname = nickname;
+    this->genresStats = genresStats;
+}
+
+QtCharts::QChart* Form::CreateChart(QPieSeries *series){
+    QChart *chart = new QChart();
+    chart->setGeometry(QRectF(0,0,1200,1000));
+    chart->addSeries(series);
+    //chart->setPlotArea(QRectF(200,0,1200,1000));
+    //chart->setAnimationOptions(QChart::AnimationOption::AllAnimations);
+    chart->legend()->detachFromChart();
+    chart->legend()->setBackgroundVisible(true);
+    chart->legend()->setBrush(QBrush(QColor(128, 128, 128, 128)));
+    chart->legend()->setPen(QPen(QColor(192, 192, 192, 192)));
+    chart->legend()->setGeometry(QRectF(20,20,350,950));
+    chart->setTitle(QString::fromStdString(this->nickname));
+    chart->legend()->setAlignment(Qt::AlignLeft);
+    //chart->legend()->attachToChart();
+    return chart;
 }
 
 void Form::processData() noexcept
 {
     srand(time(0));
+    this->setWindowTitle(QString::fromStdString(this->nickname));
+
     QPieSeries *series = new QPieSeries();
     QPieSeries *series2 = new QPieSeries();
+    QPieSeries *series3 = new QPieSeries();
     for ( const auto & a : *this->stat){
         int r = rand()%255, g = rand()%255 , b = rand()%255;
         QPieSlice * slice = new QPieSlice();
         slice->setColor(QColor(r,g,b));
         slice->setValue(a.second.titles);
-        slice->setLabel(a.first.c_str());
+        slice->setLabel((a.first + " " + std::to_string(a.second.titles)).c_str());
         series->append(slice);
 
         QPieSlice * slice2 = new QPieSlice();
         slice2->setColor(QColor(r, g, b));
         slice2->setValue(a.second.episodes);
-        slice2->setLabel(a.first.c_str());
+        slice2->setLabel((a.first + " " + std::to_string(a.second.episodes)).c_str());
         series2->append(slice2);
        }
 
-    QChart *chart = new QChart();
-    QChart *chart2 = new QChart();
-    //chart->setAnimationOptions(QChart::AnimationOption::AllAnimations);
-    chart->addSeries(series);
-    chart2->addSeries(series2);
-
-    //chart->setPlotArea(QRectF(200,0,1400,1100));
-
-    //chart->legend()->detachFromChart();
-    chart->legend()->setBackgroundVisible(true);
-    chart->legend()->setBrush(QBrush(QColor(128, 128, 128, 128)));
-    chart->legend()->setPen(QPen(QColor(192, 192, 192, 192)));
-    //chart->legend()->setGeometry(QRectF(20,20,200,1000));
-    chart->setTitle(QString::fromStdString(this->nickname));
-    this->setWindowTitle(QString::fromStdString(this->nickname));
-    chart->legend()->setAlignment(Qt::AlignLeft);
-
-    //chart->legend()->attachToChart();
-    ui->graphicsView->setChart(chart);
+    for ( const auto & a : *this->genresStats){
+        int r = rand()%255, g = rand()%255 , b = rand()%255;
+        QPieSlice * slice = new QPieSlice();
+        slice->setColor(QColor(r,g,b));
+        slice->setValue(a.second);
+        slice->setLabel((a.first + " " + std::to_string(a.second)).c_str());
+        series3->append(slice);
+    }
 
 
-    //chart2->setAnimationOptions(QChart::AnimationOption::AllAnimations);
 
-
-    //chart2->setPlotArea(QRectF(200,0,1400,1100));
-
-    //chart2->legend()->detachFromChart();
-    chart2->legend()->setBackgroundVisible(true);
-    chart2->legend()->setBrush(QBrush(QColor(128, 128, 128, 128)));
-    chart2->legend()->setPen(QPen(QColor(192, 192, 192, 192)));
-    //chart2->legend()->setGeometry(QRectF(20,20,200,1000));
-    chart2->setTitle(QString::fromStdString(this->nickname));
-    chart2->legend()->setAlignment(Qt::AlignLeft);
-
-    //chart->legend()->attachToChart();
-    ui->graphicsView_2->setChart(chart2);
-
+    ui->graphicsView  ->setChart(CreateChart(series ));
+    ui->graphicsView_2->setChart(CreateChart(series2));
+    ui->graphicsView_3->setChart(CreateChart(series3));
 
 }
 
@@ -88,5 +86,12 @@ void Form::on_pushButton_clicked()
 
 void Form::on_pushButton_2_clicked()
 {
+    this->ui->stackedWidget->setCurrentIndex(2);
+}
+
+void Form::on_pushButton_3_clicked()
+{
     this->ui->stackedWidget->setCurrentIndex(0);
 }
+
+

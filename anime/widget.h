@@ -3,7 +3,7 @@
 #include <sortcombobox.h>
 #include "dialog.h"
 #include "form.h"
-
+#include <QDebug>
 #include <QWidget>
 #include <QApplication>
 #include <QCoreApplication>

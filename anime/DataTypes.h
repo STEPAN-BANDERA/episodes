@@ -23,6 +23,7 @@ struct TitleInfo
 struct userInfo
 {
     std::map<std::string, StudioInfo> studiosStats;
+    std::map<std::string, std::size_t> genresStats;
     double hours = 0.;
     double days = 0.;
     std::size_t titles_ = 0;

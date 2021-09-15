@@ -25,15 +25,22 @@ class Form : public QWidget
 public:
     explicit Form(QWidget *parent = nullptr);
     ~Form();
-    void provideData(std::map<std::string, StudioInfo> *studiosStats, const std::string &nickname) noexcept;
+    void provideData(std::map<std::string, StudioInfo> *studiosStats,
+                     std::map<std::string, std::size_t> *genresStats,
+                     const std::string &nickname) noexcept;
     void processData() noexcept;
+    QtCharts::QChart* CreateChart(QtCharts::QPieSeries *series);
 private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
 
+    void on_pushButton_3_clicked();
+
 private:
+
     std::map<std::string, StudioInfo>*  stat;
+    std::map<std::string, std::size_t> *genresStats;
     std::string  nickname;
     Ui::Form *ui;
 };
