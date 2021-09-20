@@ -47,12 +47,14 @@ Widget::Widget(QWidget *parent)
     this->setWindowTitle("Check profile");
 
     this->setLayout(this->pVerticallbxLayout);
-    
+
     connect(pcallDialogWindow, SIGNAL (released()),this, SLOT (  GetInput()));
     //connect(pcallOpenLink,     SIGNAL (released()),this, SLOT (on_pushButton_2_clicked()));
     connect(pOpenJsonFile,     SIGNAL (released()),this, SLOT (  OpenFile()));
     connect(pShowChartStudio,  SIGNAL (released()),this, SLOT ( ShowStudioCharts()));
-    
+
+    //this->setCursor(QCursor(QPixmap(":/megumin-rotated.png")));
+    //cursor = new AnimatedCursor(this, ":/Awch.gif");
     std::atomic_init(&size, (uint32_t)0);
 
 }
@@ -127,8 +129,8 @@ void Widget::do_work(const std::string &e) noexcept
         const auto a = this->map.find(e);
 
         if (this->map.cend() != a){
-                userIdInfo.titleInfo.push_back(a->second);
-                continue;
+            userIdInfo.titleInfo.push_back(a->second);
+            continue;
         }
         //            std::string image_path = "";
         //            pos_start = str.find("<img src=\"/img/posters/");
@@ -142,7 +144,6 @@ void Widget::do_work(const std::string &e) noexcept
         //            image_path = ("https://yummyanime.club/img/posters/" + image_path + ".jpg");
         //            qDebug() << image_path.c_str();
 
-        QNetworkAccessManager manager;
         QNetworkRequest request(QUrl( (std::string("https://yummyanime.club") + e).c_str()));
         QNetworkReply *reply(manager.get(request));
         QEventLoop loop;
@@ -174,6 +175,7 @@ void Widget::do_work(const std::string &e) noexcept
             ++userIdInfo.genresStats[matches[1].str()];
             check.erase(0,matches[0].str().size()+45);
         }
+        //qDebug() << std::string("\n\n").c_str();
         //str.erase(0,pos_start_genre);
         std::size_t pos_start_studio = str.find("Студия:");
         pos_start_studio = str.find("<a href=\"/catalog/studio/", pos_start_studio);
@@ -204,10 +206,8 @@ void Widget::do_work(const std::string &e) noexcept
 
         userIdInfo.titleInfo.push_back({sub_str, studio,static_cast<std::size_t>(std::atoi(g.c_str())),0,0 });
     }
-    this->mux.lock();
     this->userInfoVector.push_back(userIdInfo);
     this->size++;
-    this->mux.unlock();
     qDebug(((std::string("thread ends") + e).c_str()));
 }
 
@@ -236,8 +236,6 @@ void Widget::GetInput()
             idVector.erase(idVector.begin()+index--);
         }
     }
-    //if ("" != text ) idVector.push_back(text);
-    //std::sort(idVector.begin(),idVector.end());
     
     for(const auto & e : idVector)
     {
@@ -245,6 +243,12 @@ void Widget::GetInput()
         std::thread(&Widget::do_work,this,std::ref(e)).detach();
         //auto a = std::async(&Widget::do_work, this, std::ref(e));
     }
+
+//    tbb::parallel_for(static_cast<std::size_t>(0), idVector.size(),
+//        [&](std::size_t index) {
+//           do_work(idVector[index]);
+//        });
+
     while (this->size.load() != this->idVector.size()) std::this_thread::yield();
 
 //    boost::asio::thread_pool pool(8);
@@ -254,12 +258,15 @@ void Widget::GetInput()
 //        boost::asio::post(pool, [this,&e](){this->do_work(e);} );
 //    }
 //    pool.join();
-    this->FormTable();
+
     this->tp2 = std::chrono::system_clock::now();
     const std::chrono::duration<double> diff = tp2 - tp;
 
 
     qDebug( (std::to_string( diff.count() ).c_str() ));
+
+    this->FormTable();
+
     //this->FormLogFiles();
 }
 

@@ -20,6 +20,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    animatedcursor.cpp \
     dialog.cpp \
     form.cpp \
     main.cpp \
@@ -29,6 +30,7 @@ SOURCES += \
 
 HEADERS += \
     DataTypes.h \
+    animatedcursor.h \
     dialog.h \
     form.h \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/include/oneapi/tbb.h \
@@ -312,3 +314,6 @@ DISTFILES += \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/redist/intel64/vc14_uwp/tbbmalloc_proxy_debug.dll \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/redist/intel64/vc14_uwp/tbbmalloc_proxy_debug.pdb \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/third-party-programs.txt
+
+RESOURCES += \
+    rc.qrc

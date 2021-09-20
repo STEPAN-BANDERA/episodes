@@ -38,7 +38,7 @@
 #include <vector>
 #include <regex>
 #include "DataTypes.h"
-
+#include "animatedcursor.h"
 
 //#ifndef Q_MOC_RUN
 #define __TBB_NO_IMPLICIT_LINKAGE 1
@@ -76,17 +76,17 @@ private:
      QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowChartGenre;
      QHBoxLayout * pHorizontalbxLayout, *pHorizontalButtonsLayout;
      QVBoxLayout * pVerticallbxLayout;
-     std::mutex mux;
      std::atomic<uint32_t> size;
      std::vector<std::string> idVector , allTitles, allImages;
      void do_work(const std::string &e) noexcept; 
      void FormTable() noexcept; 
      //void FormLogFiles() noexcept; 
      //void SaveFile( const std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * v,  std::string & str) noexcept;
-     
-     std::vector <userInfo> userInfoVector;
+     tbb::concurrent_vector<userInfo> userInfoVector;
+     //std::vector <userInfo> userInfoVector;
      Ui::Widget *ui;
      std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;
+     AnimatedCursor *cursor;
 };
 
 
