@@ -28,6 +28,7 @@
 #include <QBarSeries>
 #include <QPieSeries>
 
+#include <regex>
 #include <type_traits>
 #include <algorithm>
 #include <mutex>
@@ -39,7 +40,7 @@
 #include <regex>
 #include "DataTypes.h"
 #include "animatedcursor.h"
-
+#include <QFile>
 //#ifndef Q_MOC_RUN
 #define __TBB_NO_IMPLICIT_LINKAGE 1
 #define __TBBMALLOC_NO_IMPLICIT_LINKAGE 1
@@ -83,7 +84,6 @@ private:
      //void FormLogFiles() noexcept; 
      //void SaveFile( const std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * v,  std::string & str) noexcept;
      tbb::concurrent_vector<userInfo> userInfoVector;
-     //std::vector <userInfo> userInfoVector;
      Ui::Widget *ui;
      std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;
      AnimatedCursor *cursor;

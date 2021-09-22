@@ -68,6 +68,7 @@ void Widget::do_work(const std::string &e) noexcept
 {
     qDebug(((std::string("thread starts ") + e).c_str()));
     std::vector<TitleInfo> titles;
+    std::vector<std::string> vct2;
     userInfo userIdInfo;
     QNetworkAccessManager manager;
     QNetworkRequest request(QUrl(std::string ("https://yummyanime.club/users/id" + e + "?tab=watched" ).c_str()));
@@ -75,59 +76,16 @@ void Widget::do_work(const std::string &e) noexcept
     QEventLoop loop;
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
-    const QByteArray arr = reply->readAll();
-    std::string str = arr.toStdString();
-    const std::string str_copy= str;
-
-
-
-    const std::size_t pos_start_nickname = str.find("Профиль ");
-
-    const std::size_t pos_end_nickname = str.find("</title>", pos_start_nickname);
+    std::string str = reply->readAll().toStdString();
+    const std::size_t pos_start_nickname = str.find("Профиль "), pos_end_nickname = str.find("</title>", pos_start_nickname);
     userIdInfo.nickname = str.substr(pos_start_nickname + 14,pos_end_nickname - pos_start_nickname - 14);
     userIdInfo.id = e;
-
-
-
-    //std::size_t pos_start_rate = str.find("fa fa-star");
-    //pos_start_rate = str.find("class=\"fa fa-star\"", pos_start_rate);
-
-    //std::string rate = str.substr(pos_start_rate,1000);
-    //qDebug((rate.c_str()));
-//    qDebug((std::to_string(pos_start_studio_2).c_str()));
-//    qDebug((std::to_string(pos_end_studio).c_str()));
-//    qDebug((std::to_string(pos_end_studio - pos_start_studio_2).c_str()));
-//    qDebug((studio.c_str()));
-
-
-
-
-    std::vector<std::size_t> vct;
-    std::size_t pos_start = 0;
-    while ( (pos_start = str.find("data-typeid=")) != std::string::npos){
-        vct.push_back(pos_start + 16);
-        str.erase ( str.begin() , str.begin() + 16 + pos_start);     //
-    }
-    std::size_t index = 0 ;
-    std::vector <std::string> vct2;
-    for (const auto & e : vct) {
-        Q_UNUSED(e);
-        std::size_t size_ = 0;
-        for( std::size_t inner_index = 0 ; (inner_index <= index) && (index < vct.size()); ++inner_index){
-            size_ += vct[inner_index];
-        }
-        ++index;
-        if ((pos_start = str_copy.find("/", size_ )) != std::string::npos)
-        {
-            const std::size_t inner_size = str_copy.find("\"", pos_start);
-            vct2.push_back( str_copy.substr( pos_start , inner_size - pos_start ));
-        }
-    }
-    std::size_t _size = 0;
+    const std::regex rgx("\/catalog\/item\/([«»—0-9A-Za-z-]+)");
+    std::regex_token_iterator<std::string::iterator> a ( str.begin(), str.end(), rgx ), rend;
+    while (a != rend)
+        vct2.push_back(std::string(*a++));
     for (const auto & e : vct2){
-        
-        const auto a = this->map.find(e);
-
+        const auto &a = this->map.find(e);
         if (this->map.cend() != a){
             userIdInfo.titleInfo.push_back(a->second);
             continue;
@@ -150,7 +108,7 @@ void Widget::do_work(const std::string &e) noexcept
         QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
         const QByteArray arr = reply->readAll().left(180000);
-        std::string str= arr.toStdString();
+        const std::string str = arr.toStdString();
         const std::size_t pos_start_title = str.find("<h1>",0);
         const std::size_t end_start = str.find("</h1>",pos_start_title + 4);
         std::string sub_str = str.substr(pos_start_title + 4, end_start - pos_start_title - 4);
@@ -165,26 +123,20 @@ void Widget::do_work(const std::string &e) noexcept
         sub_str.erase(0,1);
         //str.erase(0,pos_start_title);
         std::size_t pos_start_genre = str.find("Жанр:");
-        //pos_start_studio = str.find("<a href=\"/catalog/studio/", pos_start_studio);
         std::string check = str.substr(pos_start_genre, 2000).c_str();
-
         std::regex rgx("<li><a href=\"\/catalog\/category\/[A-Za-z-]+\">(.*)<\/a><\/li>");
         std::smatch matches;
         while (std::regex_search(check, matches, rgx)){
-            //qDebug() << matches[1].str().c_str();
             ++userIdInfo.genresStats[matches[1].str()];
             check.erase(0,matches[0].str().size()+45);
         }
-        //qDebug() << std::string("\n\n").c_str();
         //str.erase(0,pos_start_genre);
         std::size_t pos_start_studio = str.find("Студия:");
         pos_start_studio = str.find("<a href=\"/catalog/studio/", pos_start_studio);
         const std::size_t pos_end_studio = str.find("\">", pos_start_studio);
         std::string studio = "";
-        if(std::string::npos != pos_end_studio){
+        if(std::string::npos != pos_end_studio)
             studio = str.substr(pos_start_studio + 25, pos_end_studio - pos_start_studio - 25);
-            //str.erase(0,pos_end_studio);
-        }
         const std::size_t pos_start_episodes = str.find("Серии:");
         std::string g (1, str[pos_start_episodes + 19]);
         if(pos_start_episodes != std::string::npos){
@@ -194,24 +146,15 @@ void Widget::do_work(const std::string &e) noexcept
                 g.push_back(str[pos_start_episodes + 21]);
             }
             else if (std::isdigit(str[pos_start_episodes + 20]))
-            {
                 g.push_back(str[pos_start_episodes + 20]);
-            }
-            _size  += std::stoi(g.c_str());
         }
-
         this->map.insert( this->map.begin(),{e, {sub_str, studio,static_cast<std::size_t>(std::atoi(g.c_str())),0,0 }});
-
-
-
         userIdInfo.titleInfo.push_back({sub_str, studio,static_cast<std::size_t>(std::atoi(g.c_str())),0,0 });
     }
     this->userInfoVector.push_back(userIdInfo);
     this->size++;
-    qDebug(((std::string("thread ends") + e).c_str()));
+    qDebug(((std::string("thread ends ") + e).c_str()));
 }
-
-
 
 void Widget::GetInput()
 {
