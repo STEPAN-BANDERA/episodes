@@ -25,9 +25,9 @@ class Form : public QWidget
 public:
     explicit Form(QWidget *parent = nullptr);
     ~Form();
-    void provideData(std::map<std::string, StudioInfo> *studiosStats,
-                     std::map<std::string, std::size_t> *genresStats,
-                     const std::string &nickname) noexcept;
+    void provideData(std::map<QString, StudioInfo> *studiosStats,
+                     std::map<QString, std::int32_t> *genresStats,
+                     const QString &nickname) noexcept;
     void processData() noexcept;
     QtCharts::QChart* CreateChart(QtCharts::QPieSeries *series);
 private slots:
@@ -39,9 +39,9 @@ private slots:
 
 private:
 
-    std::map<std::string, StudioInfo>*  stat;
-    std::map<std::string, std::size_t> *genresStats;
-    std::string  nickname;
+    std::map<QString, StudioInfo>*  stat;
+    std::map<QString, std::int32_t> *genresStats;
+    QString  nickname;
     Ui::Form *ui;
 };
 

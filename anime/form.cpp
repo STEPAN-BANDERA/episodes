@@ -13,7 +13,7 @@ Form::~Form()
     delete ui;
 }
 
-void Form::provideData(std::map<std::string, StudioInfo> *studiosStats, std::map<std::string, std::size_t> *genresStats, const std::string &nickname) noexcept
+void Form::provideData(std::map<QString, StudioInfo> *studiosStats, std::map<QString, std::int32_t> *genresStats, const QString &nickname) noexcept
 {
     this->stat = studiosStats;
     this->nickname = nickname;
@@ -31,7 +31,7 @@ QtCharts::QChart* Form::CreateChart(QPieSeries *series){
     chart->legend()->setBrush(QBrush(QColor(128, 128, 128, 128)));
     chart->legend()->setPen(QPen(QColor(192, 192, 192, 192)));
     chart->legend()->setGeometry(QRectF(20,20,350,950));
-    chart->setTitle(QString::fromStdString(this->nickname));
+    chart->setTitle(this->nickname);
     chart->legend()->setAlignment(Qt::AlignLeft);
     //chart->legend()->attachToChart();
     return chart;
@@ -40,7 +40,7 @@ QtCharts::QChart* Form::CreateChart(QPieSeries *series){
 void Form::processData() noexcept
 {
     srand(time(0));
-    this->setWindowTitle(QString::fromStdString(this->nickname));
+    this->setWindowTitle(this->nickname);
 
     QPieSeries *series = new QPieSeries();
     QPieSeries *series2 = new QPieSeries();
@@ -50,13 +50,13 @@ void Form::processData() noexcept
         QPieSlice * slice = new QPieSlice();
         slice->setColor(QColor(r,g,b));
         slice->setValue(a.second.titles);
-        slice->setLabel((a.first + " " + std::to_string(a.second.titles)).c_str());
+        slice->setLabel(a.first + QString(" ") + QString::number(a.second.titles));
         series->append(slice);
 
         QPieSlice * slice2 = new QPieSlice();
         slice2->setColor(QColor(r, g, b));
         slice2->setValue(a.second.episodes);
-        slice2->setLabel((a.first + " " + std::to_string(a.second.episodes)).c_str());
+        slice2->setLabel(a.first + QString(" ") + QString::number(a.second.episodes));
         series2->append(slice2);
        }
 
@@ -65,7 +65,7 @@ void Form::processData() noexcept
         QPieSlice * slice = new QPieSlice();
         slice->setColor(QColor(r,g,b));
         slice->setValue(a.second);
-        slice->setLabel((a.first + " " + std::to_string(a.second)).c_str());
+        slice->setLabel(a.first + QString(" ") + QString::number(a.second));
         series3->append(slice);
     }
 

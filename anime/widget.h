@@ -69,7 +69,7 @@ private slots:
      //void on_pushButton_2_clicked();
      
 private:
-     tbb::concurrent_map <std::string, TitleInfo> map;
+     tbb::concurrent_map <QString, TitleInfo> map;
      Form * pForm;
      QTableWidget * ptableWidget;
      QComboBox *pidComboBoxList;
@@ -78,11 +78,12 @@ private:
      QHBoxLayout * pHorizontalbxLayout, *pHorizontalButtonsLayout;
      QVBoxLayout * pVerticallbxLayout;
      std::atomic<uint32_t> size;
-     std::vector<std::string> idVector , allTitles, allImages;
-     void do_work(const std::string &e) noexcept; 
+     std::vector<QString> allTitles, allImages;
+     QStringList list;
+     void do_work(const QString &e) noexcept; 
      void FormTable() noexcept; 
      //void FormLogFiles() noexcept; 
-     //void SaveFile( const std::vector<std::pair<std::string,std::pair<std::size_t,std::size_t>>> * v,  std::string & str) noexcept;
+     //void SaveFile( const std::vector<std::pair<QString,std::pair<std::int32_t,std::int32_t>>> * v,  QString & str) noexcept;
      tbb::concurrent_vector<userInfo> userInfoVector;
      Ui::Widget *ui;
      std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;
