@@ -6,6 +6,7 @@ Dialog::Dialog(QWidget *parent) :
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
+    this->ui->textEdit->setText("269705\n729512\n430622\n676306\n771703\n486214\n536964\n454905\n701345");
 }
 
 Dialog::~Dialog()

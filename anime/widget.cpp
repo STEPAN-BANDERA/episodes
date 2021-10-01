@@ -57,6 +57,7 @@ Widget::Widget(QWidget *parent)
     //cursor = new AnimatedCursor(this, ":/Awch.gif");
     std::atomic_init(&size, (uint32_t)0);
 
+    //this->ptableWidget->setSortingEnabled(true);
 }
 
 Widget::~Widget()
@@ -69,7 +70,6 @@ void Widget::do_work(const QString &e) noexcept
     qDebug() << QString("thread starts ") << e;
     std::vector<TitleInfo> titles;
     std::vector<QString> vct2;
-    std::vector<std::wstring> vct;
     userInfo userIdInfo;
     QNetworkAccessManager manager;
     QNetworkRequest request(QUrl(QString("https://yummyanime.club/users/id") + e + QString("?tab=watched")));
@@ -141,16 +141,8 @@ void Widget::do_work(const QString &e) noexcept
         const QString str = QString(arr);
         const std::int32_t pos_start_title = str.indexOf("<h1>",0);
         const std::int32_t end_start = str.indexOf("</h1>",pos_start_title + 4);
-        QString sub_str = str.mid(pos_start_title + 4, end_start - pos_start_title - 4);
-        std::int32_t doubleSpace = sub_str.indexOf("  ");
-        while (doubleSpace != -1)
-        {
-            sub_str.remove(doubleSpace, 2);
-            doubleSpace = sub_str.indexOf("  ");
-        }
+        QString sub_str = str.mid(pos_start_title + 4, end_start - pos_start_title - 4).replace("  ", "").remove(0,1);
         sub_str.chop(2);
-        sub_str.remove(0,1);
-        //str.erase(0,pos_start_title);
         std::int32_t pos_start_genre = str.indexOf("Жанр:");
         QString check = str.mid(pos_start_genre, 2000);
 //        std::regex rgx("<li><a href=\"\/catalog\/category\/[A-Za-z-]+\">(.*)<\/a><\/li>");
@@ -167,22 +159,22 @@ void Widget::do_work(const QString &e) noexcept
         if(-1 != pos_end_studio)
             studio = str.mid(pos_start_studio + 25, pos_end_studio - pos_start_studio - 25);
         const std::int32_t pos_start_episodes = str.indexOf("Серии:");
-        QString g (1, str[pos_start_episodes + 19]);
+        QString g (1, str[pos_start_episodes + 14]);
         if(pos_start_episodes != -1){
-            if (str[pos_start_episodes + 21].isDigit())
+            if (str[pos_start_episodes + 16].isDigit())
             {
-                g.push_back(str[pos_start_episodes + 20]);
-                g.push_back(str[pos_start_episodes + 21]);
+                g.push_back(str[pos_start_episodes + 16]);
+                g.push_back(str[pos_start_episodes + 15]);
             }
-            else if (str[pos_start_episodes + 20].isDigit())
-                g.push_back(str[pos_start_episodes + 20]);
+            else if (str[pos_start_episodes + 15].isDigit())
+                g.push_back(str[pos_start_episodes + 15]);
         }
         this->map.insert( this->map.begin(),{e, {sub_str, studio,static_cast<std::int32_t>(g.toInt()),0,0 }});
         userIdInfo.titleInfo.push_back({sub_str, studio,static_cast<std::int32_t>(g.toInt()),0,0 });
     }
     this->userInfoVector.push_back(userIdInfo);
     this->size++;
-    qDebug() << QString("thread ends ") + QString(e);
+    qDebug() << QString("thread ends ") + e;
 }
 
 void Widget::GetInput()
@@ -196,16 +188,8 @@ void Widget::GetInput()
     this->tp = std::chrono::system_clock::now();
     QString text = (d.getText().toUtf8().constData() + QString("\n"));
     qDebug() << text;
-//    std::int32_t pos;
     this->list = text.split('\n');
-//    for (std::int32_t index = 0; index < idVector.size(); ++index){
-//        if(!std::regex_match(idVector[index],re)){
-//            idVector.erase(idVector.begin()+index--);
-//        }
-//    }
-    QString str;
     for (std::int32_t index = 0; index < this->list.size(); index++){
-        //std::thread(&Widget::do_work,this,std::ref(str)).detach();
         if(regex.exactMatch(this->list.at(static_cast<int>(index)))){
             std::thread(&Widget::do_work,this,this->list.at(static_cast<int>(index))).detach();
         }
@@ -227,23 +211,10 @@ void Widget::GetInput()
 //        });
 
     while (this->size.load() != this->list.size()) std::this_thread::yield();
-
-//    boost::asio::thread_pool pool(8);
-    
-//    for(const auto & e : idVector)
-//    {
-//        boost::asio::post(pool, [this,&e](){this->do_work(e);} );
-//    }
-//    pool.join();
-
     this->tp2 = std::chrono::system_clock::now();
     const std::chrono::duration<double> diff = tp2 - tp;
-
-
-    qDebug( (std::to_string( diff.count() ).c_str() ));
-
+    qDebug() << diff.count();
     this->FormTable();
-
     //this->FormLogFiles();
 }
 
@@ -309,7 +280,6 @@ void Widget::FormTable() noexcept
             }
             userInfoVector[index].episode += userInfoVector[index].titleInfo[inner_index].episodes;
         }
-
         QString filename = QDir::currentPath() + QString("/") + QDateTime::currentDateTime().toString("yyyy.MM.dd") + QString("_")
                                                 + QDateTime::currentDateTime().toString("hh.mm.ss") + QString("_") + this->list[index] + QString(".json");
         QJsonDocument document;
@@ -322,15 +292,12 @@ void Widget::FormTable() noexcept
         }
         else qDebug() << "Cannot open file";
         userInfoVector[index].titles_ = static_cast<std::int32_t>(userInfoVector[index].titleInfo.size());
-        //this->userInfoVector.push_back(info);
-
     }
-    //this->ptableWidget->setSortingEnabled(true);
     this->ptableWidget->insertRow(0);
     for (std::int32_t var = 0; var < this->userInfoVector.size(); ++var) {
-        this->ptableWidget->setItem(0, static_cast<int>(9*var    ),new QTableWidgetItem( userInfoVector[var].nickname  ));
-        this->ptableWidget->setItem(1, static_cast<int>(9*var    ),new QTableWidgetItem( userInfoVector[var].id  ));
-        this->ptableWidget->setItem(0, static_cast<int>(9*var + 1),new QTableWidgetItem( QString("Всего: ") + this->userInfoVector[var].titles_ ));
+        this->ptableWidget->setItem(0, static_cast<int>(9*var    ),new QTableWidgetItem( this->userInfoVector[var].nickname  ));
+        this->ptableWidget->setItem(1, static_cast<int>(9*var    ),new QTableWidgetItem( this->userInfoVector[var].id  ));
+        this->ptableWidget->setItem(0, static_cast<int>(9*var + 1),new QTableWidgetItem( QString("Всего: ") + QString::number(this->userInfoVector[var].titles_)));
         this->ptableWidget->setItem(0, static_cast<int>(9*var + 3),new QTableWidgetItem( QString::number( this->userInfoVector[var].episode    )));
         this->ptableWidget->setItem(0, static_cast<int>(9*var + 4),new QTableWidgetItem( QString::number( this->userInfoVector[var].episode*20 )));
         this->ptableWidget->setItem(0, static_cast<int>(9*var + 5),new QTableWidgetItem( QString::number( this->userInfoVector[var].episode/3. )));
