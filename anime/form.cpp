@@ -31,7 +31,7 @@ QtCharts::QChart* Form::CreateChart(QPieSeries *series){
     chart->legend()->setBrush(QBrush(QColor(128, 128, 128, 128)));
     chart->legend()->setPen(QPen(QColor(192, 192, 192, 192)));
     chart->legend()->setGeometry(QRectF(20,20,350,950));
-    chart->setTitle(this->nickname);
+    chart->setTitle(this->nickname + QString("-") + QString::number(this->total_titles));
     chart->legend()->setAlignment(Qt::AlignLeft);
     //chart->legend()->attachToChart();
     return chart;
@@ -51,6 +51,7 @@ void Form::processData() noexcept
         slice->setColor(QColor(r,g,b));
         slice->setValue(a.second.titles);
         slice->setLabel(a.first + QString(" ") + QString::number(a.second.titles));
+        this->total_titles += a.second.titles;
         series->append(slice);
 
         QPieSlice * slice2 = new QPieSlice();

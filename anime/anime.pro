@@ -182,6 +182,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
+    Designbolts-Thin-Download-Server-File-Download.ico \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/.gitattributes \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/.gitignore \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/LICENSE.txt \

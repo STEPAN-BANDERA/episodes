@@ -1,5 +1,6 @@
 #ifndef DATATYPES_H
 #define DATATYPES_H
+#define COLUMN_COUNT 11
 #include <QString>
 #include <vector>
 #include <map>
@@ -20,6 +21,7 @@ struct TitleInfo
     operator QString() const {
         return title + QString(" ") + QString::number(rate)+ QString(" ") + QString::number(episodes) + QString(" ") + QString::number(position) + QString(" ") + studio;
     }
+    std::vector<QString> genres;
 };
 
 struct userInfo

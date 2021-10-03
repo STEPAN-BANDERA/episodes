@@ -27,6 +27,7 @@
 #include <QBarSet>
 #include <QBarSeries>
 #include <QPieSeries>
+#include <QColor>
 
 #include <regex>
 #include <type_traits>
@@ -77,8 +78,8 @@ private:
      QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowChartGenre;
      QHBoxLayout * pHorizontalbxLayout, *pHorizontalButtonsLayout;
      QVBoxLayout * pVerticallbxLayout;
-     std::atomic<uint32_t> size;
-     std::vector<QString> allTitles, allImages;
+     std::atomic<std::uint32_t> size;
+     //std::vector<QString> allTitles, allImages;
      QStringList list;
      void do_work(const QString &e) noexcept; 
      void FormTable() noexcept; 

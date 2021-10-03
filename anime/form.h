@@ -42,6 +42,8 @@ private:
     std::map<QString, StudioInfo>*  stat;
     std::map<QString, std::int32_t> *genresStats;
     QString  nickname;
+    std::int32_t total_titles = 0;
+    std::int32_t total_episodes = 0;
     Ui::Form *ui;
 };
 
