@@ -27,6 +27,7 @@ public:
     ~Form();
     void provideData(std::map<QString, StudioInfo> *studiosStats,
                      std::map<QString, std::int32_t> *genresStats,
+                     std::vector<RatingInfo>* ratingInfo,
                      const QString &nickname) noexcept;
     void processData() noexcept;
     QtCharts::QChart* CreateChart(QtCharts::QPieSeries *series);
@@ -37,10 +38,13 @@ private slots:
 
     void on_pushButton_3_clicked();
 
+    void on_pushButton_4_clicked();
+
 private:
 
     std::map<QString, StudioInfo>*  stat;
-    std::map<QString, std::int32_t> *genresStats;
+    std::map<QString, std::int32_t>* genresStats;
+    std::vector<RatingInfo>* ratingInfo;
     QString  nickname;
     std::int32_t total_titles = 0;
     std::int32_t total_episodes = 0;

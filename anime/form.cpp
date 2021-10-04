@@ -13,11 +13,15 @@ Form::~Form()
     delete ui;
 }
 
-void Form::provideData(std::map<QString, StudioInfo> *studiosStats, std::map<QString, std::int32_t> *genresStats, const QString &nickname) noexcept
+void Form::provideData(std::map<QString, StudioInfo> *studiosStats,
+                       std::map<QString, std::int32_t> *genresStats,
+                       std::vector<RatingInfo>* ratingInfo,
+                       const QString &nickname) noexcept
 {
     this->stat = studiosStats;
     this->nickname = nickname;
     this->genresStats = genresStats;
+    this->ratingInfo = ratingInfo;
 }
 
 QtCharts::QChart* Form::CreateChart(QPieSeries *series){
@@ -42,9 +46,10 @@ void Form::processData() noexcept
     srand(time(0));
     this->setWindowTitle(this->nickname);
 
-    QPieSeries *series = new QPieSeries();
+    QPieSeries *series  = new QPieSeries();
     QPieSeries *series2 = new QPieSeries();
     QPieSeries *series3 = new QPieSeries();
+    QPieSeries *series4 = new QPieSeries();
     for ( const auto & a : *this->stat){
         int r = rand()%255, g = rand()%255 , b = rand()%255;
         QPieSlice * slice = new QPieSlice();
@@ -70,12 +75,23 @@ void Form::processData() noexcept
         series3->append(slice);
     }
 
-
+    std::map<std::int32_t, std::int32_t> rating;
+    for ( const auto & a : *this->ratingInfo){
+        ++rating[a.user_rating];
+    }
+    for ( const auto & a : rating){
+        int r = rand()%255, g = rand()%255 , b = rand()%255;
+        QPieSlice * slice = new QPieSlice();
+        slice->setColor(QColor(r,g,b));
+        slice->setValue(a.second);
+        slice->setLabel(QString::number(a.first) + QString(" ") + QString::number(a.second));
+        series4->append(slice);
+    }
 
     ui->graphicsView  ->setChart(CreateChart(series ));
     ui->graphicsView_2->setChart(CreateChart(series2));
     ui->graphicsView_3->setChart(CreateChart(series3));
-
+    ui->graphicsView_4->setChart(CreateChart(series4));
 }
 
 
@@ -92,7 +108,13 @@ void Form::on_pushButton_2_clicked()
 
 void Form::on_pushButton_3_clicked()
 {
-    this->ui->stackedWidget->setCurrentIndex(0);
+    this->ui->stackedWidget->setCurrentIndex(3);
 }
 
+
+
+void Form::on_pushButton_4_clicked()
+{
+    this->ui->stackedWidget->setCurrentIndex(0);
+}
 
