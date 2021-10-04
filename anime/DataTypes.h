@@ -10,9 +10,14 @@ struct StudioInfo
     std::int32_t titles = 0;
     std::int32_t episodes = 0;
 };
+struct RatingInfo{
+    float total_rating = 0.;
+    float user_rating = 0.;
+};
 
 struct TitleInfo
 {
+    RatingInfo ratingInfo;
     QString title;
     QString studio;
     std::int32_t episodes;
