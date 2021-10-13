@@ -39,7 +39,7 @@
 #include <string>
 #include <vector>
 #include <regex>
-#include "DataTypes.h"
+#include "datatypes.h"
 #include "animatedcursor.h"
 #include <QFile>
 //#ifndef Q_MOC_RUN
@@ -89,6 +89,7 @@ private:
      Ui::Widget *ui;
      std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;
      AnimatedCursor *cursor;
+     std::mutex lock_table_form_mux;
 };
 
 
