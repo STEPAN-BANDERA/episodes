@@ -1,14 +1,14 @@
 <RCC>
     <qresource prefix="/">
-        <file>darkness.png</file>
-        <file>megumin.jpg</file>
-        <file>megumin.png</file>
-        <file>megumin-2.png</file>
-        <file>resizeimage.png</file>
-        <file>fire-force-tamaki.gif</file>
-        <file>367490_1570645387.gif</file>
-        <file>Awch.gif</file>
-        <file>megumin-rotated.png</file>
-        <file>1.ico</file>
+        <file>images/darkness.png</file>
+        <file>images/megumin.jpg</file>
+        <file>images/megumin.png</file>
+        <file>images/megumin-2.png</file>
+        <file>images/resizeimage.png</file>
+        <file>images/megumin-rotated.png</file>
+        <file>images/1.ico</file>
+        <file>gif/fire-force-tamaki.gif</file>
+        <file>gif/367490_1570645387.gif</file>
+        <file>gif/Awch.gif</file>
     </qresource>
 </RCC>

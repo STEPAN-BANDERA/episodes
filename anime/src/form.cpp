@@ -88,6 +88,28 @@ void Form::processData() noexcept
         series4->append(slice);
     }
 
+
+
+
+    Chart *chart = new Chart();
+    chart->addSeries(series);
+    chart->setTitle("Zoom in/out example");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+    chart->legend()->hide();
+    chart->createDefaultAxes();
+
+    ChartView *chartView = new ChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+
+
+
+//    auto a = ui->stackedWidget->widget(1);
+//    a->
+
+
+
+
     ui->graphicsView  ->setChart(CreateChart(series ));
     ui->graphicsView_2->setChart(CreateChart(series2));
     ui->graphicsView_3->setChart(CreateChart(series3));

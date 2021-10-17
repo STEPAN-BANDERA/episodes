@@ -223,9 +223,7 @@ void Widget::GetInput()
 
 
 
-//    this->tp2 = std::chrono::system_clock::now();
-//    const std::chrono::duration<double> diff = tp2 - tp;
-//    qDebug() << diff.count();
+
 
     //this->FormLogFiles();
 }
@@ -350,6 +348,11 @@ void Widget::FormTable() noexcept
     }
     //this->allTitles.erase(std::unique(this->allTitles.begin(),this->allTitles.end()),this->allTitles.end());
     //for (const auto & e : this->idVector) this->sortComboBox->addItem(QString::fromStdString( ("https://yummyanime.club/users/id" + e)  ));
+
+    this->tp2 = std::chrono::system_clock::now();
+    const std::chrono::duration<double> diff = tp2 - tp;
+    qDebug() << diff.count();
+
     lock_table_form_mux.unlock();
 }
 

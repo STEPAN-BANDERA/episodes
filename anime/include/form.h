@@ -13,6 +13,8 @@
 #include <QRectF>
 #include <QRect>
 #include "DataTypes.h"
+#include "chart.h"
+#include "chartview.h"
 
 namespace Ui {
 class Form;

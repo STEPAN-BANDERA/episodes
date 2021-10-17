@@ -5,6 +5,7 @@ CONFIG += c++17
 TEMPLATE = app
 DESTDIR  = /build
 INCLUDEPATH += Q:\git\episodes\anime\oneapi-tbb-2021.3.0-win\oneapi-tbb-2021.3.0\include
+INCLUDEPATH += include/
 
 LIBS += -L"$$_PRO_FILE_PWD_"
 LIBS += -ltbb
@@ -20,19 +21,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    animatedcursor.cpp \
-    dialog.cpp \
-    form.cpp \
-    main.cpp \
-    sortcombobox.cpp \
-    tablesortmodel.cpp \
-    widget.cpp
+    src/animatedcursor.cpp \
+    src/chart.cpp \
+    src/chartview.cpp \
+    src/dialog.cpp \
+    src/form.cpp \
+    src/main.cpp \
+    src/sortcombobox.cpp \
+    src/tablesortmodel.cpp \
+    src/widget.cpp
 
 HEADERS += \
-    DataTypes.h \
-    animatedcursor.h \
-    dialog.h \
-    form.h \
+    include/chart.h \
+    include/chartview.h \
+    include/datatypes.h \
+    include/animatedcursor.h \
+    include/dialog.h \
+    include/form.h \
+    include/sortcombobox.h \
+    include/tablesortmodel.h \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/include/oneapi/tbb.h \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/include/oneapi/tbb/blocked_range.h \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/include/oneapi/tbb/blocked_range2d.h \
@@ -167,14 +174,14 @@ HEADERS += \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/include/tbb/tbbmalloc_proxy.h \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/include/tbb/tick_count.h \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/include/tbb/version.h \
-    sortcombobox.h \
-    tablesortmodel.h \
-    widget.h
+    include/sortcombobox.h \
+    include/tablesortmodel.h \
+    include/widget.h
 
 FORMS += \
-    dialog.ui \
-    form.ui \
-    widget.ui
+    ui/dialog.ui \
+    ui/form.ui \
+    ui/widget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
