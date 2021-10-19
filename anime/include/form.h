@@ -12,6 +12,10 @@
 #include <QtGlobal>
 #include <QRectF>
 #include <QRect>
+#include <QLineSeries>
+#include <QValueAxis>
+#include <QMouseEvent>
+#include <QRubberBand>
 #include "DataTypes.h"
 #include "chart.h"
 #include "chartview.h"
@@ -41,6 +45,8 @@ private slots:
     void on_pushButton_3_clicked();
 
     void on_pushButton_4_clicked();
+
+    void on_pushButton_5_clicked();
 
 private:
 

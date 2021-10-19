@@ -89,17 +89,24 @@ void Form::processData() noexcept
     }
 
 
+    QLineSeries *series5 = new QLineSeries();
+    for (int i = 0; i < 500; i++) {
+        QPointF p((qreal) i, qSin(M_PI / 50 * i) * 100);
+        p.ry() += QRandomGenerator::global()->bounded(20);
 
+        series5->append(p.rx(), p.ry());
+    }
 
     Chart *chart = new Chart();
-    chart->addSeries(series);
+    chart->addSeries(series5);
     chart->setTitle("Zoom in/out example");
     chart->setAnimationOptions(QChart::SeriesAnimations);
     chart->legend()->hide();
     chart->createDefaultAxes();
 
-    ChartView *chartView = new ChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
+
+//    ChartView *chartView = new ChartView(/*chart*/);
+//    chartView->setRenderHint(QPainter::Antialiasing);
 
 
 
@@ -108,7 +115,7 @@ void Form::processData() noexcept
 //    a->
 
 
-
+    ui->graphicsView_6->setChart(chart);
 
     ui->graphicsView  ->setChart(CreateChart(series ));
     ui->graphicsView_2->setChart(CreateChart(series2));
@@ -136,6 +143,12 @@ void Form::on_pushButton_3_clicked()
 
 
 void Form::on_pushButton_4_clicked()
+{
+    this->ui->stackedWidget->setCurrentIndex(4);
+}
+
+
+void Form::on_pushButton_5_clicked()
 {
     this->ui->stackedWidget->setCurrentIndex(0);
 }

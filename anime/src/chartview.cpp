@@ -30,11 +30,16 @@
 #include "chartview.h"
 #include <QtGui/QMouseEvent>
 
-ChartView::ChartView(QChart *chart, QWidget *parent) :
-    QChartView(chart, parent),
+ChartView::ChartView(QWidget *parent) :
+    QChartView(parent),
     m_isTouching(false)
 {
     setRubberBand(QChartView::RectangleRubberBand);
+}
+
+void ChartView::SetQchart(QChart *qchart)
+{
+    this->setChart(qchart);
 }
 
 bool ChartView::viewportEvent(QEvent *event)
