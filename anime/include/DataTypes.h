@@ -32,7 +32,7 @@ struct userInfo
 {
     std::map<QString, StudioInfo> studiosStats;
     std::map<QString, std::int32_t> genresStats;
-    std::vector<QString> date;
+    std::vector<QDateTime> date;
     double hours = 0.;
     double days = 0.;
     std::int32_t titles_ = 0;

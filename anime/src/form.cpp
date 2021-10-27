@@ -16,12 +16,15 @@ Form::~Form()
 void Form::provideData(std::map<QString, StudioInfo> *studiosStats,
                        std::map<QString, std::int32_t> *genresStats,
                        std::vector<RatingInfo>* ratingInfo,
-                       const QString &nickname) noexcept
+                       const QString &nickname,
+                       std::vector<QDateTime>* date
+                       ) noexcept
 {
     this->stat = studiosStats;
     this->nickname = nickname;
     this->genresStats = genresStats;
     this->ratingInfo = ratingInfo;
+    this->date = date;
 }
 
 QtCharts::QChart* Form::CreateChart(QPieSeries *series){
@@ -53,6 +56,7 @@ void Form::processData() noexcept
     for ( const auto & a : *this->stat){
         int r = rand()%255, g = rand()%255 , b = rand()%255;
         QPieSlice * slice = new QPieSlice();
+        slice->setLabelVisible(1);
         slice->setColor(QColor(r,g,b));
         slice->setValue(a.second.titles);
         slice->setLabel(a.first + QString(" ") + QString::number(a.second.titles));
@@ -60,6 +64,7 @@ void Form::processData() noexcept
         series->append(slice);
 
         QPieSlice * slice2 = new QPieSlice();
+        slice2->setLabelVisible(1);
         slice2->setColor(QColor(r, g, b));
         slice2->setValue(a.second.episodes);
         slice2->setLabel(a.first + QString(" ") + QString::number(a.second.episodes));
@@ -69,6 +74,7 @@ void Form::processData() noexcept
     for ( const auto & a : *this->genresStats){
         int r = rand()%255, g = rand()%255 , b = rand()%255;
         QPieSlice * slice = new QPieSlice();
+        slice->setLabelVisible(1);
         slice->setColor(QColor(r,g,b));
         slice->setValue(a.second);
         slice->setLabel(a.first + QString(" ") + QString::number(a.second));
@@ -82,6 +88,7 @@ void Form::processData() noexcept
     for ( const auto & a : rating){
         int r = rand()%255, g = rand()%255 , b = rand()%255;
         QPieSlice * slice = new QPieSlice();
+        slice->setLabelVisible(1);
         slice->setColor(QColor(r,g,b));
         slice->setValue(a.second);
         slice->setLabel(QString::number(a.first) + QString(" ") + QString::number(a.second));
@@ -90,9 +97,13 @@ void Form::processData() noexcept
 
 
     QLineSeries *series5 = new QLineSeries();
-    for (int i = 0; i < 500; i++) {
-        QPointF p((qreal) i, qSin(M_PI / 50 * i) * 100);
-        p.ry() += QRandomGenerator::global()->bounded(20);
+    for (std::size_t i = 0; i < (*this->date).size(); i++) {
+        qDebug() << (*this->date)[i].toTime_t();
+
+        QPointF p(static_cast<qreal>((*this->date)[i].toTime_t()),
+                  static_cast<qreal>(1));
+        //QPointF p((qreal) i, qSin(M_PI / 50 * i) * 100);
+        //p.ry() += QRandomGenerator::global()->bounded(20);
 
         series5->append(p.rx(), p.ry());
     }

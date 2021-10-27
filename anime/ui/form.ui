@@ -99,10 +99,10 @@
       <widget class="ChartView" name="graphicsView_6">
        <property name="geometry">
         <rect>
-         <x>470</x>
-         <y>240</y>
-         <width>256</width>
-         <height>192</height>
+         <x>275</x>
+         <y>11</y>
+         <width>611</width>
+         <height>541</height>
         </rect>
        </property>
       </widget>

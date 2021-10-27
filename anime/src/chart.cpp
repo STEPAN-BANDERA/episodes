@@ -59,6 +59,7 @@ bool Chart::gestureEvent(QGestureEvent *event)
     if (QGesture *gesture = event->gesture(Qt::PanGesture)) {
         QPanGesture *pan = static_cast<QPanGesture *>(gesture);
         QChart::scroll(-(pan->delta().x()), pan->delta().y());
+        //pan->
     }
 
     if (QGesture *gesture = event->gesture(Qt::PinchGesture)) {

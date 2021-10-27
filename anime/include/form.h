@@ -34,7 +34,9 @@ public:
     void provideData(std::map<QString, StudioInfo> *studiosStats,
                      std::map<QString, std::int32_t> *genresStats,
                      std::vector<RatingInfo>* ratingInfo,
-                     const QString &nickname) noexcept;
+                     const QString &nickname,
+                     std::vector<QDateTime> *date
+                     ) noexcept;
     void processData() noexcept;
     QtCharts::QChart* CreateChart(QtCharts::QPieSeries *series);
 private slots:
@@ -49,7 +51,7 @@ private slots:
     void on_pushButton_5_clicked();
 
 private:
-
+    std::vector<QDateTime>* date;
     std::map<QString, StudioInfo>*  stat;
     std::map<QString, std::int32_t>* genresStats;
     std::vector<RatingInfo>* ratingInfo;
