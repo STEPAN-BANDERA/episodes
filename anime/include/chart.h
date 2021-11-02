@@ -47,13 +47,18 @@ public:
     ~Chart();
 
 protected:
-    bool sceneEvent(QEvent *event);
+    bool sceneEvent(QEvent *event) override;
 
 private:
     bool gestureEvent(QGestureEvent *event);
 
 private:
 
+
+    // QGraphicsItem interface
+protected:
+    void keyPressEvent(QKeyEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
 };
 
 #endif // CHART_H

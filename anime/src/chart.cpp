@@ -31,6 +31,7 @@
 #include <QtWidgets/QGesture>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
+#include <QDebug>
 
 Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags)
     : QChart(QChart::ChartTypeCartesian, parent, wFlags)
@@ -49,25 +50,41 @@ Chart::~Chart()
 //![1]
 bool Chart::sceneEvent(QEvent *event)
 {
-    if (event->type() == QEvent::Gesture)
-        return gestureEvent(static_cast<QGestureEvent *>(event));
+//    qDebug() << event->type();
+//    qDebug() << "sceneEvent";
+//    if (event->type() == QEvent::Gesture)
+//        return gestureEvent(static_cast<QGestureEvent *>(event));
     return QChart::event(event);
 }
 
 bool Chart::gestureEvent(QGestureEvent *event)
 {
-    if (QGesture *gesture = event->gesture(Qt::PanGesture)) {
-        QPanGesture *pan = static_cast<QPanGesture *>(gesture);
-        QChart::scroll(-(pan->delta().x()), pan->delta().y());
-        //pan->
-    }
+//    qDebug() << "gestureEvent";
+//    if (QGesture *gesture = event->gesture(Qt::PanGesture)) {
+//        qDebug() << "QPanGesture";
+//        QPanGesture *pan = static_cast<QPanGesture *>(gesture);
+//        QChart::scroll(-(pan->delta().x()), pan->delta().y());
 
-    if (QGesture *gesture = event->gesture(Qt::PinchGesture)) {
-        QPinchGesture *pinch = static_cast<QPinchGesture *>(gesture);
-        if (pinch->changeFlags() & QPinchGesture::ScaleFactorChanged)
-            QChart::zoom(pinch->scaleFactor());
-    }
+//    }
+
+//    if (QGesture *gesture = event->gesture(Qt::PinchGesture)) {
+//        qDebug() << "QPinchGesture";
+//        QPinchGesture *pinch = static_cast<QPinchGesture *>(gesture);
+//        if (pinch->changeFlags() & QPinchGesture::ScaleFactorChanged)
+//            QChart::zoom(pinch->scaleFactor());
+
+//    }
 
     return true;
+}
+
+void Chart::keyPressEvent(QKeyEvent *event)
+{
+    //qDebug() << event->type();
+}
+
+void Chart::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    //qDebug() << event ;
 }
 //![1]

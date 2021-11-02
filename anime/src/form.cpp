@@ -53,7 +53,28 @@ void Form::processData() noexcept
     QPieSeries *series2 = new QPieSeries();
     QPieSeries *series3 = new QPieSeries();
     QPieSeries *series4 = new QPieSeries();
+
+    QLineSeries *series6 = new QLineSeries();
+    series6->setPointLabelsVisible(true);
+    series6->setPointLabelsColor(Qt::black);
+    series6->setPointLabelsFormat("@yPoint");
+    series6->setColor(Qt::darkBlue);
+
+    QLineSeries *series5 = new QLineSeries();
+    series5->setPointLabelsVisible(true);
+    series5->setPointLabelsColor(Qt::black);
+    series5->setPointLabelsFormat("@yPoint");
+    series5->setColor(Qt::red);
+    std::sort ((*this->date).begin(), (*this->date).end());
+    for (std::size_t i = 0; i < (*this->date).size(); i++) {
+
+        series5->append((*this->date)[i  ].toMSecsSinceEpoch(), i);
+    }
+
+    std::size_t i = 0;
     for ( const auto & a : *this->stat){
+        //qcharview
+
         int r = rand()%255, g = rand()%255 , b = rand()%255;
         QPieSlice * slice = new QPieSlice();
         slice->setLabelVisible(1);
@@ -69,6 +90,10 @@ void Form::processData() noexcept
         slice2->setValue(a.second.episodes);
         slice2->setLabel(a.first + QString(" ") + QString::number(a.second.episodes));
         series2->append(slice2);
+
+        //chartview
+        series6->append((*this->date)[i++].toMSecsSinceEpoch(), a.second.episodes);
+
        }
 
     for ( const auto & a : *this->genresStats){
@@ -96,25 +121,29 @@ void Form::processData() noexcept
     }
 
 
-    QLineSeries *series5 = new QLineSeries();
-    for (std::size_t i = 0; i < (*this->date).size(); i++) {
-        qDebug() << (*this->date)[i].toTime_t();
 
-        QPointF p(static_cast<qreal>((*this->date)[i].toTime_t()),
-                  static_cast<qreal>(1));
-        //QPointF p((qreal) i, qSin(M_PI / 50 * i) * 100);
-        //p.ry() += QRandomGenerator::global()->bounded(20);
 
-        series5->append(p.rx(), p.ry());
-    }
 
-    Chart *chart = new Chart();
-    chart->addSeries(series5);
-    chart->setTitle("Zoom in/out example");
-    chart->setAnimationOptions(QChart::SeriesAnimations);
-    chart->legend()->hide();
-    chart->createDefaultAxes();
+    this->titles_line_chart = new Chart();
+    this->titles_line_chart->addSeries(series5);
+    this->titles_line_chart->setTitle("titles");
+    this->titles_line_chart->setAnimationOptions(QChart::SeriesAnimations);
+    this->titles_line_chart->legend()->hide();
+    this->titles_line_chart->createDefaultAxes();
+    QDateTimeAxis *axisX1 = new QDateTimeAxis;
+    axisX1->setFormat("dd-MM-yyyy h:mm:s");
+    this->titles_line_chart->setAxisX(axisX1, series5);
 
+
+    this->episodes_line_chart = new Chart();
+    this->episodes_line_chart->addSeries(series6);
+    this->episodes_line_chart->setTitle("episodes");
+    this->episodes_line_chart->setAnimationOptions(QChart::SeriesAnimations);
+    this->episodes_line_chart->legend()->hide();
+    this->episodes_line_chart->createDefaultAxes();
+    QDateTimeAxis *axisX2 = new QDateTimeAxis;
+    axisX2->setFormat("dd-MM-yyyy h:mm:s");
+    this->episodes_line_chart->setAxisX(axisX2, series6);
 
 //    ChartView *chartView = new ChartView(/*chart*/);
 //    chartView->setRenderHint(QPainter::Antialiasing);
@@ -126,7 +155,7 @@ void Form::processData() noexcept
 //    a->
 
 
-    ui->graphicsView_6->setChart(chart);
+    ui->graphicsView_6->setChart(titles_line_chart);
 
     ui->graphicsView  ->setChart(CreateChart(series ));
     ui->graphicsView_2->setChart(CreateChart(series2));
@@ -162,5 +191,11 @@ void Form::on_pushButton_4_clicked()
 void Form::on_pushButton_5_clicked()
 {
     this->ui->stackedWidget->setCurrentIndex(0);
+}
+
+
+void Form::on_pushButton_6_clicked() // this is not page swap
+{
+    ui->graphicsView_6->setChart(episodes_line_chart);
 }
 

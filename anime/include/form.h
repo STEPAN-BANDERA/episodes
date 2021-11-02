@@ -50,7 +50,10 @@ private slots:
 
     void on_pushButton_5_clicked();
 
+    void on_pushButton_6_clicked();
+
 private:
+    Chart *titles_line_chart, * episodes_line_chart;
     std::vector<QDateTime>* date;
     std::map<QString, StudioInfo>*  stat;
     std::map<QString, std::int32_t>* genresStats;

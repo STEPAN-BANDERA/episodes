@@ -29,6 +29,7 @@
 
 #include "chartview.h"
 #include <QtGui/QMouseEvent>
+#include <QtCharts>
 
 ChartView::ChartView(QWidget *parent) :
     QChartView(parent),
@@ -60,6 +61,17 @@ bool ChartView::viewportEvent(QEvent *event)
 
 void ChartView::mousePressEvent(QMouseEvent *event)
 {
+
+//    auto const widgetPos = event->localPos();
+//    auto const scenePos = mapToScene(QPoint(static_cast<int>(widgetPos.x()), static_cast<int>(widgetPos.y())));
+//    auto const chartItemPos = chart()->mapFromScene(scenePos);
+//    auto const valueGivenSeries = chart()->mapToValue(chartItemPos);
+//    qDebug() << "widgetPos:" << widgetPos;
+//    qDebug() << "scenePos:" << scenePos;
+//    qDebug() << "chartItemPos:" << chartItemPos;
+//    qDebug() << "valSeries:" << valueGivenSeries;
+
+
     if (m_isTouching)
         return;
     QChartView::mousePressEvent(event);
@@ -84,31 +96,75 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
     QChartView::mouseReleaseEvent(event);
 }
 
-//![1]
+auto ChartView::seriesRect(QChart *chart, QAbstractSeries *series) {
+   auto inScene = chart->plotArea();
+   auto inChart = chart->mapFromScene(inScene);
+   auto inChartRect = inChart.boundingRect();
+   auto inItem1 = chart->mapToValue(inChartRect.topLeft(), series);
+   auto inItem2 = chart->mapToValue(inChartRect.bottomRight(), series);
+   return QRectF(inItem1, inItem2).normalized();
+}
+
+auto ChartView::pointsInRect(QXYSeries *series, const QRectF &rect) {
+   QVector<QPointF> result;
+   auto const points = series->pointsVector();
+   std::copy_if(points.begin(), points.end(), std::back_inserter(result),
+                [rect](auto &p) { return rect.contains(p); });
+   return result;
+}
+
 void ChartView::keyPressEvent(QKeyEvent *event)
 {
-    switch (event->key()) {
-    case Qt::Key_Plus:
-        chart()->zoomIn();
-        break;
-    case Qt::Key_Minus:
-        chart()->zoomOut();
-        break;
-//![1]
-    case Qt::Key_Left:
-        chart()->scroll(-10, 0);
-        break;
-    case Qt::Key_Right:
-        chart()->scroll(10, 0);
-        break;
-    case Qt::Key_Up:
-        chart()->scroll(0, 10);
-        break;
-    case Qt::Key_Down:
-        chart()->scroll(0, -10);
-        break;
-    default:
-        QGraphicsView::keyPressEvent(event);
-        break;
+
+
+
+    QAbstractSeries* series = this->chart()->series()[0];
+    QLineSeries* lineSeries = qobject_cast<QLineSeries*>(series);
+
+    auto rect = seriesRect(this->chart(), lineSeries);
+    auto const points = pointsInRect(lineSeries, rect);
+    foreach (auto var, points) {
+        qDebug() << qSetRealNumberPrecision(16) << var.rx() << " " << var.ry();
     }
+    qDebug() << points.size();
+
+    if (event->key() == Qt::Key_Plus) {
+            chart()->zoomIn();
+        }
+
+
+//    qDebug() << event->type();
+//    auto b = chart()->series();
+//    qDebug() << "b size" << b.size();
+//    auto c = b[0];
+//    auto d = dynamic_cast<QPieSeries*>(c);
+//    auto a = d->slices(); //[0]->slices();
+//    qDebug() << "a size" << a.size();
+//    foreach (const auto &var, a) {
+//       qDebug() << var;
+//    }
+//    //a[0]->chart();
+//    if (event->key() == Qt::Key_Plus) {
+//        chart()->zoomIn();
+//       // auto a = chart->series();
+//    }
+//    else if (event->key() == Qt::Key_Minus) {
+//        chart()->zoomOut();
+//    }
+////![1]
+//    case Qt::Key_Left:
+//        chart()->scroll(-10, 0);
+//        break;
+//    case Qt::Key_Right:
+//        chart()->scroll(10, 0);
+//        break;
+//    case Qt::Key_Up:
+//        chart()->scroll(0, 10);
+//        break;
+//    case Qt::Key_Down:
+//        chart()->scroll(0, -10);
+//        break;
+//    else {
+//        QGraphicsView::keyPressEvent(event);
+//    }
 }

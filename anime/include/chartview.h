@@ -32,6 +32,7 @@
 
 #include <QChartView>
 #include <QtWidgets/QRubberBand>
+#include <QXYSeries>
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -52,6 +53,8 @@ protected:
 //![2]
 
 private:
+    auto seriesRect(QChart *chart, QAbstractSeries *series = nullptr);
+    auto pointsInRect(QXYSeries *series, const QRectF &rect);
     bool m_isTouching;
 };
 
