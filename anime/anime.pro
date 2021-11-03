@@ -1,5 +1,5 @@
 QT       += core gui network widgets charts
-
+greaterThan(6, QT_MAJOR_VERSION): QT += core5compat
 CONFIG += c++17
 
 TEMPLATE = app
