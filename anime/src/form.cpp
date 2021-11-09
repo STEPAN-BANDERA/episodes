@@ -27,6 +27,19 @@ void Form::provideData(std::map<QString, StudioInfo> *studiosStats,
     this->date = date;
 }
 
+void Form::setupLineSeries(QLineSeries* series,
+                           bool is_label_visible,
+                           Qt::GlobalColor label_color,
+                           const QString &labels_format,
+                           Qt::GlobalColor series_color
+                           ) noexcept
+{
+    series->setPointLabelsVisible(is_label_visible);
+    series->setPointLabelsColor(label_color);
+    series->setPointLabelsFormat(labels_format);
+    series->setColor(series_color);
+}
+
 QtCharts::QChart* Form::CreateChart(QPieSeries *series){
     QChart *chart = new QChart();
     chart->setGeometry(QRectF(0,0,1200,1000));
@@ -44,31 +57,40 @@ QtCharts::QChart* Form::CreateChart(QPieSeries *series){
     return chart;
 }
 
+void Form::setupQPieSlice(
+        QPieSlice * slice,
+        bool is_slice_visible,
+        QColor slice_color,
+        qreal slice_value,
+        const QString &slice_label
+        ) noexcept
+{
+    slice->setLabelVisible(is_slice_visible);
+    slice->setColor(slice_color);
+    slice->setValue(slice_value);
+    slice->setLabel(slice_label);
+}
+
 void Form::processData() noexcept
 {
     srand(time(0));
     this->setWindowTitle(this->nickname);
 
-    QPieSeries *series  = new QPieSeries();
-    QPieSeries *series2 = new QPieSeries();
-    QPieSeries *series3 = new QPieSeries();
-    QPieSeries *series4 = new QPieSeries();
+    this->studios_pie_series  = new QPieSeries();
+    this->episodes_pie_series = new QPieSeries();
+    this->genres_pie_series = new QPieSeries();
+    this->marks_pie_series = new QPieSeries();
 
-    QLineSeries *series6 = new QLineSeries();
-    series6->setPointLabelsVisible(true);
-    series6->setPointLabelsColor(Qt::black);
-    series6->setPointLabelsFormat("@yPoint");
-    series6->setColor(Qt::darkBlue);
+    this->episodes_line_series = new QLineSeries();
+    this->setupLineSeries(this->episodes_line_series, true, Qt::black, "@yPoint", Qt::darkBlue);
 
-    QLineSeries *series5 = new QLineSeries();
-    series5->setPointLabelsVisible(true);
-    series5->setPointLabelsColor(Qt::black);
-    series5->setPointLabelsFormat("@yPoint");
-    series5->setColor(Qt::red);
+    this->titles_line_series = new QLineSeries();
+    this->setupLineSeries(this->titles_line_series, true, Qt::black, "@yPoint", Qt::red);
+
     std::sort ((*this->date).begin(), (*this->date).end());
     for (std::size_t i = 0; i < (*this->date).size(); i++) {
 
-        series5->append((*this->date)[i  ].toMSecsSinceEpoch(), i);
+        this->titles_line_series->append((*this->date)[i  ].toMSecsSinceEpoch(), i);
     }
 
     std::size_t i = 0;
@@ -78,24 +100,17 @@ void Form::processData() noexcept
 
         int r = rand()%255, g = rand()%255 , b = rand()%255;
         QPieSlice * slice = new QPieSlice();
-        slice->setLabelVisible(1);
-        slice->setColor(QColor(r,g,b));
-        slice->setValue(a.second.titles);
-        slice->setLabel(a.first + QString(" ") + QString::number(a.second.titles));
+        this->setupQPieSlice(slice, 1, QColor(r,g,b), a.second.titles, a.first + QString(" ") + QString::number(a.second.titles));
         this->total_titles += a.second.titles;
-        series->append(slice);
-
+        this->studios_pie_series->append(slice);
         QPieSlice * slice2 = new QPieSlice();
-        slice2->setLabelVisible(1);
-        slice2->setColor(QColor(r, g, b));
-        slice2->setValue(a.second.episodes);
-        slice2->setLabel(a.first + QString(" ") + QString::number(a.second.episodes));
-        series2->append(slice2);
+        this->setupQPieSlice(slice2, 1, QColor(r,g,b), a.second.episodes, a.first + QString(" ") + QString::number(a.second.episodes));
+        this->episodes_pie_series->append(slice2);
 
         //chartview
 
         total_episodes +=  a.second.episodes;
-        series6->append((*this->date)[i++].toMSecsSinceEpoch(), total_episodes);
+        this->episodes_line_series->append((*this->date)[i++].toMSecsSinceEpoch(), total_episodes);
 
        }
 
@@ -106,7 +121,7 @@ void Form::processData() noexcept
         slice->setColor(QColor(r,g,b));
         slice->setValue(a.second);
         slice->setLabel(a.first + QString(" ") + QString::number(a.second));
-        series3->append(slice);
+        this->genres_pie_series->append(slice);
     }
 
     std::map<std::int32_t, std::int32_t> rating;
@@ -120,7 +135,7 @@ void Form::processData() noexcept
         slice->setColor(QColor(r,g,b));
         slice->setValue(a.second);
         slice->setLabel(QString::number(a.first) + QString(" ") + QString::number(a.second));
-        series4->append(slice);
+        this->marks_pie_series->append(slice);
     }
 
 
@@ -128,25 +143,25 @@ void Form::processData() noexcept
 
 
     this->titles_line_chart = new Chart();
-    this->titles_line_chart->addSeries(series5);
+    this->titles_line_chart->addSeries(this->titles_line_series);
     this->titles_line_chart->setTitle("titles");
     this->titles_line_chart->setAnimationOptions(QChart::SeriesAnimations);
     this->titles_line_chart->legend()->hide();
     this->titles_line_chart->createDefaultAxes();
     QDateTimeAxis *axisX1 = new QDateTimeAxis;
     axisX1->setFormat("dd-MM-yyyy h:mm:s");
-    this->titles_line_chart->setAxisX(axisX1, series5);
+    this->titles_line_chart->setAxisX(axisX1, this->titles_line_series);
 
 
     this->episodes_line_chart = new Chart();
-    this->episodes_line_chart->addSeries(series6);
+    this->episodes_line_chart->addSeries(this->episodes_line_series);
     this->episodes_line_chart->setTitle("episodes");
     this->episodes_line_chart->setAnimationOptions(QChart::SeriesAnimations);
     this->episodes_line_chart->legend()->hide();
     this->episodes_line_chart->createDefaultAxes();
     QDateTimeAxis *axisX2 = new QDateTimeAxis;
     axisX2->setFormat("dd-MM-yyyy h:mm:s");
-    this->episodes_line_chart->setAxisX(axisX2, series6);
+    this->episodes_line_chart->setAxisX(axisX2, this->episodes_line_series);
 
 //    ChartView *chartView = new ChartView(/*chart*/);
 //    chartView->setRenderHint(QPainter::Antialiasing);
@@ -160,10 +175,10 @@ void Form::processData() noexcept
 
     ui->graphicsView_6->setChart(titles_line_chart);
 
-    ui->graphicsView  ->setChart(CreateChart(series ));
-    ui->graphicsView_2->setChart(CreateChart(series2));
-    ui->graphicsView_3->setChart(CreateChart(series3));
-    ui->graphicsView_4->setChart(CreateChart(series4));
+    ui->graphicsView  ->setChart(CreateChart(this->studios_pie_series ));
+    ui->graphicsView_2->setChart(CreateChart(this->episodes_pie_series));
+    ui->graphicsView_3->setChart(CreateChart(this->genres_pie_series));
+    ui->graphicsView_4->setChart(CreateChart(this->marks_pie_series));
 }
 
 
