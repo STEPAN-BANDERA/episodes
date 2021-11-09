@@ -72,6 +72,7 @@ void Form::processData() noexcept
     }
 
     std::size_t i = 0;
+    int32_t total_episodes = 0;
     for ( const auto & a : *this->stat){
         //qcharview
 
@@ -92,7 +93,9 @@ void Form::processData() noexcept
         series2->append(slice2);
 
         //chartview
-        series6->append((*this->date)[i++].toMSecsSinceEpoch(), a.second.episodes);
+
+        total_episodes +=  a.second.episodes;
+        series6->append((*this->date)[i++].toMSecsSinceEpoch(), total_episodes);
 
        }
 

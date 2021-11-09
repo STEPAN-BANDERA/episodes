@@ -152,6 +152,7 @@ void Widget::do_work(const QString &e) noexcept
         QString sub_str = str.mid(pos_start_title + 4, end_start - pos_start_title - 4).replace("  ", "").remove(0,1);
         sub_str.chop(2);
         const std::int32_t pos_start_genre = str.indexOf("Жанр:");
+        if (-1 == pos_start_genre) continue;
         const QStringRef check (&str, pos_start_genre, 2000);
         QRegularExpressionMatchIterator i4 = rgx4.globalMatch(check);
         std::vector<QString> genres;
