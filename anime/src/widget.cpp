@@ -80,11 +80,11 @@ void Widget::do_work(const QString &e) noexcept
     const std::int32_t pos_start_nickname = str.indexOf("Профиль "), pos_end_nickname = str.indexOf("</title>", pos_start_nickname);
     userIdInfo.nickname = str.mid(pos_start_nickname + 8,pos_end_nickname - pos_start_nickname - 8);
     userIdInfo.id = e;
-    const QRegularExpression  rgx("<div class=\"update-list-flex\">[\\x{0000}-\\x{ffff}]{0,1000}<\\/div>[\x20\r\n]+<\\/div>");
-    const QRegularExpression  rgx2("<i\ class=\"fa\ fa-star\"></i>\ ([0-9.]+)");
-    const QRegularExpression  rgx3("\/catalog\/item\/([«»—0-9A-Za-z-]+)");
-    const QRegularExpression  rgx4("<li><a href=\"\/catalog\/category\/[A-Za-z-]+\">([\\x{0000}-\\x{ffff}]{0,40})<\/a><\/li>");
-    const QRegularExpression  rgx5("data-createdat=\"([0-9]+)\"");
+    const QRegularExpression rgx("<div class=\"update-list-flex\">[\\x{0000}-\\x{ffff}]{0,1000}<\\/div>[\x20\r\n]+<\\/div>");
+    const QRegularExpression rgx2("<i\ class=\"fa\ fa-star\"></i>\ ([0-9.]+)");
+    const QRegularExpression rgx3("\/catalog\/item\/([«»—0-9A-Za-z-]+)");
+    const QRegularExpression rgx4("<li><a href=\"\/catalog\/category\/[A-Za-z-]+\">([\\x{0000}-\\x{ffff}]{0,40})<\/a><\/li>");
+    const QRegularExpression rgx5("data-createdat=\"([0-9]+)\"");
     QRegularExpressionMatchIterator i5 = rgx5.globalMatch(str);
     while (i5.hasNext()) {
         QRegularExpressionMatch match5 = i5.next();
@@ -92,7 +92,6 @@ void Widget::do_work(const QString &e) noexcept
             QDateTime timestamp;
             timestamp.setTime_t(match5.captured(1).toInt());
             userIdInfo.date.push_back(timestamp);
-            //userIdInfo.date.push_back(timestamp.toString(Qt::SystemLocaleShortDate));
         }
     }
     QRegularExpressionMatchIterator i = rgx.globalMatch(str);
@@ -192,21 +191,19 @@ void Widget::GetInput()
 {
     QRegExp regex("[0-9]+");
     Dialog d(this);
-    if(d.exec() == QDialog::Rejected) return;
+    if (d.exec() == QDialog::Rejected) return;
     this->list.clear();
     this->ptableWidget->setRowCount(0);
     this->size.store(0);
     this->tp = std::chrono::system_clock::now();
-    QString text = (d.getText().toUtf8().constData() + QString("\n"));
+    QString text = d.getText().toUtf8().constData() + QString("\n");
     qDebug() << text;
     this->list = text.split('\n');
     for (std::int32_t index = 0; index < this->list.size(); index++){
-        if(regex.exactMatch(this->list.at(static_cast<int>(index)))){
+        if (regex.exactMatch(this->list.at(static_cast<int>(index))))
             std::thread(&Widget::do_work,this,this->list.at(static_cast<int>(index))).detach();
-        }
-        else {
+        else
             this->list.removeAt(static_cast<int>(index--));
-        }
     }
         //std::thread(&Widget::do_work,this,std::ref(str)).detach();
 //    for(const auto & e : this->list)
@@ -222,11 +219,6 @@ void Widget::GetInput()
 //        });
 
     //while (this->size.load() != this->list.size()) std::this_thread::yield();
-
-
-
-
-
     //this->FormLogFiles();
 }
 
@@ -326,17 +318,13 @@ void Widget::FormTable() noexcept
         lock_table_form_mux.unlock();
         return;
     }
-    for (std::int32_t current_index = 0; current_index < this->list.size(); ++current_index )
-    {
-        for(const auto & a : userInfoVector[current_index].titleInfo){
-            for( const auto & b : a.genres){
+    for (std::int32_t current_index = 0; current_index < this->list.size(); ++current_index)
+        for(const auto & a : userInfoVector[current_index].titleInfo)
+            for( const auto & b : a.genres)
                 ++userInfoVector[current_index].genresStats[b];
-            }
-        }
-     }
     this->ptableWidget->insertRow(0);
     for (std::int32_t var = 0; var < this->userInfoVector.size(); ++var) {
-        QTableWidgetItem * w = new QTableWidgetItem( this->userInfoVector[var].nickname);
+        QTableWidgetItem * w = new QTableWidgetItem(this->userInfoVector[var].nickname);
         w->setBackgroundColor(Qt::green);
         w->setIcon(QIcon(":/images/1.ico"));
         this->ptableWidget->setItem(0, static_cast<int>(COLUMN_COUNT*var    ),w );
@@ -364,11 +352,7 @@ void Widget::ShowStudioCharts() noexcept
     for(auto & e : this->userInfoVector){
         Form *pForm = new Form();
         pForm->setAttribute(Qt::WA_DeleteOnClose);
-        pForm->provideData(&e.studiosStats,
-                           &e.genresStats,
-                           &e.ratingInfo,
-                           e.nickname,
-                           &e.date);
+        pForm->provideData(&e.studiosStats, &e.genresStats, &e.ratingInfo, e.nickname, &e.date, &e.titleInfo);
         pForm->processData();
         pForm->show();
     }
@@ -470,7 +454,7 @@ void Widget::OpenFile()
 //    QDesktopServices::openUrl(QUrl(QString::fromStdString((this->pidComboBoxList->currentText().toStdString()))));
 //}
 
-bool operator < ( const TitleInfo &first , const TitleInfo &second )
+bool operator < (const TitleInfo &first , const TitleInfo &second)
 {
   return first.title < second.title;
 }

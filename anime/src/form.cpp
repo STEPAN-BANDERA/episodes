@@ -15,9 +15,10 @@ Form::~Form()
 
 void Form::provideData(std::map<QString, StudioInfo> *studiosStats,
                        std::map<QString, std::int32_t> *genresStats,
-                       std::vector<RatingInfo>* ratingInfo,
+                       std::vector<RatingInfo> *ratingInfo,
                        const QString &nickname,
-                       std::vector<QDateTime>* date
+                       std::vector<QDateTime> *date,
+                       std::vector<TitleInfo> *titleInfo
                        ) noexcept
 {
     this->stat = studiosStats;
@@ -25,22 +26,40 @@ void Form::provideData(std::map<QString, StudioInfo> *studiosStats,
     this->genresStats = genresStats;
     this->ratingInfo = ratingInfo;
     this->date = date;
+    this->titleInfo = titleInfo;
 }
 
-void Form::setupLineSeries(QLineSeries* series,
-                           bool is_label_visible,
+QLineSeries *Form::setupLineSeries(bool is_label_visible,
                            Qt::GlobalColor label_color,
                            const QString &labels_format,
                            Qt::GlobalColor series_color
                            ) noexcept
 {
+    QLineSeries *series = new QLineSeries();
     series->setPointLabelsVisible(is_label_visible);
     series->setPointLabelsColor(label_color);
     series->setPointLabelsFormat(labels_format);
     series->setColor(series_color);
+    return series;
 }
 
-QtCharts::QChart* Form::CreateChart(QPieSeries *series){
+QPieSlice *Form::setupQPieSlice(
+        qreal slice_value,
+        const QString &slice_label,
+        QColor slice_color,
+        bool is_slice_visible
+        ) noexcept
+{
+    QPieSlice *slice = new QPieSlice();
+    slice->setLabelVisible(is_slice_visible);
+    slice->setColor(slice_color);
+    slice->setValue(slice_value);
+    slice->setLabel(slice_label);
+    return slice;
+}
+
+QChart *Form::CreateChart(QPieSeries *series, const QString &title) noexcept
+{
     QChart *chart = new QChart();
     chart->setGeometry(QRectF(0,0,1200,1000));
     chart->addSeries(series);
@@ -51,169 +70,99 @@ QtCharts::QChart* Form::CreateChart(QPieSeries *series){
     chart->legend()->setBrush(QBrush(QColor(128, 128, 128, 128)));
     chart->legend()->setPen(QPen(QColor(192, 192, 192, 192)));
     chart->legend()->setGeometry(QRectF(20,20,350,950));
-    chart->setTitle(this->nickname + QString("-") + QString::number(this->total_titles));
+    chart->setTitle(title);
     chart->legend()->setAlignment(Qt::AlignLeft);
     //chart->legend()->attachToChart();
     return chart;
 }
 
-void Form::setupQPieSlice(
-        QPieSlice * slice,
-        bool is_slice_visible,
-        QColor slice_color,
-        qreal slice_value,
-        const QString &slice_label
-        ) noexcept
+QChart *Form::CreateChart(QLineSeries *series, const QString &title) noexcept
 {
-    slice->setLabelVisible(is_slice_visible);
-    slice->setColor(slice_color);
-    slice->setValue(slice_value);
-    slice->setLabel(slice_label);
+    QChart *chart = new Chart();
+    chart->addSeries(series);
+    chart->setTitle(title);
+    //chart->setAnimationOptions(QChart::SeriesAnimations);
+    chart->legend()->hide();
+    chart->createDefaultAxes();
+    QDateTimeAxis *axisX1 = new QDateTimeAxis;
+    axisX1->setFormat("dd-MM-yyyy h:mm:s");
+    chart->setAxisX(axisX1, series);
+    return chart;
 }
 
 void Form::processData() noexcept
 {
     srand(time(0));
+    std::int32_t i = 0, total_episodes = 0;
     this->setWindowTitle(this->nickname);
-
     this->studios_pie_series  = new QPieSeries();
     this->episodes_pie_series = new QPieSeries();
     this->genres_pie_series = new QPieSeries();
     this->marks_pie_series = new QPieSeries();
-
-    this->episodes_line_series = new QLineSeries();
-    this->setupLineSeries(this->episodes_line_series, true, Qt::black, "@yPoint", Qt::darkBlue);
-
-    this->titles_line_series = new QLineSeries();
-    this->setupLineSeries(this->titles_line_series, true, Qt::black, "@yPoint", Qt::red);
-
-    std::sort ((*this->date).begin(), (*this->date).end());
-    for (std::size_t i = 0; i < (*this->date).size(); i++) {
-
-        this->titles_line_series->append((*this->date)[i  ].toMSecsSinceEpoch(), i);
+    this->episodes_line_series = this->setupLineSeries(true, Qt::black, "@yPoint", Qt::darkBlue);
+    this->titles_line_series = this->setupLineSeries(true, Qt::black, "@yPoint", Qt::red);
+    std::sort(this->date->begin(), this->date->end());
+    for (std::size_t i = 0; i < this->date->size(); i++)
+        this->titles_line_series->append((*this->date)[i].toMSecsSinceEpoch(), i);
+    for (std::size_t i = 0; i < this->titleInfo->size(); i++){
+        total_episodes += (*this->titleInfo)[i].episodes;
+        this->episodes_line_series->append((*this->date)[i].toMSecsSinceEpoch(), total_episodes);
     }
-
-    std::size_t i = 0;
-    int32_t total_episodes = 0;
-    for ( const auto & a : *this->stat){
-        //qcharview
-
-        int r = rand()%255, g = rand()%255 , b = rand()%255;
-        QPieSlice * slice = new QPieSlice();
-        this->setupQPieSlice(slice, 1, QColor(r,g,b), a.second.titles, a.first + QString(" ") + QString::number(a.second.titles));
+    for (const auto &a : *this->stat){
+        std::int32_t r = rand()%255, g = rand()%255, b = rand()%255;
         this->total_titles += a.second.titles;
-        this->studios_pie_series->append(slice);
-        QPieSlice * slice2 = new QPieSlice();
-        this->setupQPieSlice(slice2, 1, QColor(r,g,b), a.second.episodes, a.first + QString(" ") + QString::number(a.second.episodes));
-        this->episodes_pie_series->append(slice2);
-
-        //chartview
-
-        total_episodes +=  a.second.episodes;
-        this->episodes_line_series->append((*this->date)[i++].toMSecsSinceEpoch(), total_episodes);
-
+        this->studios_pie_series ->append(this->setupQPieSlice(a.second.titles,   a.first + QString(" - ") + QString::number(a.second.titles  ), {r,b,g}));
+        this->episodes_pie_series->append(this->setupQPieSlice(a.second.episodes, a.first + QString(" - ") + QString::number(a.second.episodes), {r,b,g}));
        }
-
-    for ( const auto & a : *this->genresStats){
-        int r = rand()%255, g = rand()%255 , b = rand()%255;
-        QPieSlice * slice = new QPieSlice();
-        slice->setLabelVisible(1);
-        slice->setColor(QColor(r,g,b));
-        slice->setValue(a.second);
-        slice->setLabel(a.first + QString(" ") + QString::number(a.second));
-        this->genres_pie_series->append(slice);
-    }
-
+    for (const auto &a : *this->genresStats)
+        this->genres_pie_series->append(this->setupQPieSlice(a.second, a.first + QString(" - ") + QString::number(a.second)));
     std::map<std::int32_t, std::int32_t> rating;
-    for ( const auto & a : *this->ratingInfo){
+    for ( const auto &a : *this->ratingInfo)
         ++rating[a.user_rating];
-    }
-    for ( const auto & a : rating){
-        int r = rand()%255, g = rand()%255 , b = rand()%255;
-        QPieSlice * slice = new QPieSlice();
-        slice->setLabelVisible(1);
-        slice->setColor(QColor(r,g,b));
-        slice->setValue(a.second);
-        slice->setLabel(QString::number(a.first) + QString(" ") + QString::number(a.second));
-        this->marks_pie_series->append(slice);
-    }
-
-
-
-
-
-    this->titles_line_chart = new Chart();
-    this->titles_line_chart->addSeries(this->titles_line_series);
-    this->titles_line_chart->setTitle("titles");
-    this->titles_line_chart->setAnimationOptions(QChart::SeriesAnimations);
-    this->titles_line_chart->legend()->hide();
-    this->titles_line_chart->createDefaultAxes();
-    QDateTimeAxis *axisX1 = new QDateTimeAxis;
-    axisX1->setFormat("dd-MM-yyyy h:mm:s");
-    this->titles_line_chart->setAxisX(axisX1, this->titles_line_series);
-
-
-    this->episodes_line_chart = new Chart();
-    this->episodes_line_chart->addSeries(this->episodes_line_series);
-    this->episodes_line_chart->setTitle("episodes");
-    this->episodes_line_chart->setAnimationOptions(QChart::SeriesAnimations);
-    this->episodes_line_chart->legend()->hide();
-    this->episodes_line_chart->createDefaultAxes();
-    QDateTimeAxis *axisX2 = new QDateTimeAxis;
-    axisX2->setFormat("dd-MM-yyyy h:mm:s");
-    this->episodes_line_chart->setAxisX(axisX2, this->episodes_line_series);
-
-//    ChartView *chartView = new ChartView(/*chart*/);
-//    chartView->setRenderHint(QPainter::Antialiasing);
-
-
-
-
-//    auto a = ui->stackedWidget->widget(1);
-//    a->
-
-
-    ui->graphicsView_6->setChart(titles_line_chart);
-
-    ui->graphicsView  ->setChart(CreateChart(this->studios_pie_series ));
-    ui->graphicsView_2->setChart(CreateChart(this->episodes_pie_series));
-    ui->graphicsView_3->setChart(CreateChart(this->genres_pie_series));
-    ui->graphicsView_4->setChart(CreateChart(this->marks_pie_series));
-}
-
-
-void Form::on_pushButton_clicked()
-{
-    this->ui->stackedWidget->setCurrentIndex(1);
-}
-
-
-void Form::on_pushButton_2_clicked()
-{
-    this->ui->stackedWidget->setCurrentIndex(2);
-}
-
-void Form::on_pushButton_3_clicked()
-{
-    this->ui->stackedWidget->setCurrentIndex(3);
-}
-
-
-
-void Form::on_pushButton_4_clicked()
-{
-    this->ui->stackedWidget->setCurrentIndex(4);
-}
-
-
-void Form::on_pushButton_5_clicked()
-{
+    for (const auto &a : rating)
+        this->marks_pie_series->append(this->setupQPieSlice(a.second,  QString::number(a.first) + QString(" - ") + QString::number(a.second)));
+    this->insertPage<QChartView, QPieSeries>(this->marks_pie_series);
+    this->insertPage<QChartView, QPieSeries>(this->genres_pie_series);
+    this->insertPage<QChartView, QPieSeries>(this->episodes_pie_series);
+    this->insertPage<QChartView, QPieSeries>(this->studios_pie_series);
+    this->insertPage<ChartView, QLineSeries>(this->titles_line_series);
+    this->insertPage<ChartView, QLineSeries>(this->episodes_line_series);
     this->ui->stackedWidget->setCurrentIndex(0);
 }
 
-
-void Form::on_pushButton_6_clicked() // this is not page swap
+template <class T, class U>
+void Form::insertPage(U *series) noexcept
 {
-    ui->graphicsView_6->setChart(episodes_line_chart);
+    QPushButton *button_next = new QPushButton("Next"), *button_prev = new QPushButton("Previous");
+    connect(button_next, SIGNAL(clicked()), this, SLOT(moveToNextPage()));
+    connect(button_prev, SIGNAL(clicked()), this, SLOT(moveToPrevPage()));
+    T *view = new T();
+    const QString title = this->nickname + QString(" - ") + QString::number(this->total_titles);
+    view->setChart(CreateChart(series, title));
+    QVBoxLayout *vlayout = new QVBoxLayout();
+    vlayout->addWidget(button_next);
+    vlayout->addWidget(button_prev);
+    QHBoxLayout *hlayout = new QHBoxLayout();
+    hlayout->addWidget(view);
+    hlayout->addLayout(vlayout);
+    QWidget * widget = new QWidget;
+    widget->setLayout(hlayout);
+    this->ui->stackedWidget->insertWidget(0, widget);
+    ++pages_amount;
 }
 
+void Form::moveToNextPage() noexcept
+{
+    if (this->ui->stackedWidget->currentIndex() == pages_amount - 1)
+        this->ui->stackedWidget->setCurrentIndex(0);
+    else
+        this->ui->stackedWidget->setCurrentIndex(this->ui->stackedWidget->currentIndex()+1);
+}
+
+void Form::moveToPrevPage() noexcept
+{
+    if (this->ui->stackedWidget->currentIndex() == 0)
+        this->ui->stackedWidget->setCurrentIndex(pages_amount - 1);
+    else
+        this->ui->stackedWidget->setCurrentIndex(this->ui->stackedWidget->currentIndex()-1);
+}
