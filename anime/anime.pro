@@ -177,9 +177,7 @@ HEADERS += \
     include/widget.h
 
 FORMS += \
-    ui/dialog.ui \
-    ui/form.ui \
-    ui/widget.ui
+    ui/dialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
