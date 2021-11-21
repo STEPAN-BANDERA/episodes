@@ -1,14 +1,13 @@
 #include "widget.h"
-#include "ui_widget.h"
 
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::Widget)
 {
-    this->ui->setupUi(this);
     //this->allTitles.reserve(1000);
     //this->allUsersTitles.reserve(10);
+    this->resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
+
     this->ptableWidget = new QTableWidget;
 
     this->sortComboBox = new SortComboBox;
@@ -62,7 +61,6 @@ Widget::Widget(QWidget *parent)
 
 Widget::~Widget()
 {
-    delete ui;
 }
 
 void Widget::do_work(const QString &e) noexcept
@@ -350,10 +348,16 @@ void Widget::ShowStudioCharts() noexcept
 {
 
     for(auto & e : this->userInfoVector){
+
+
         Form *pForm = new Form();
         pForm->setAttribute(Qt::WA_DeleteOnClose);
         pForm->provideData(&e.studiosStats, &e.genresStats, &e.ratingInfo, e.nickname, &e.date, &e.titleInfo);
-        pForm->processData();
+        //std::thread([pForm](){
+            pForm->processData();
+        //}).detach();
+
+
         pForm->show();
     }
 

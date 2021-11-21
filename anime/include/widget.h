@@ -51,10 +51,6 @@
 #include "tbb/parallel_for.h"
 //#endif
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class Widget; }
-QT_END_NAMESPACE
-
 class Widget : public QWidget
 {
     Q_OBJECT
@@ -86,7 +82,6 @@ private:
      //void FormLogFiles() noexcept; 
      //void SaveFile( const std::vector<std::pair<QString,std::pair<std::int32_t,std::int32_t>>> * v,  QString & str) noexcept;
      tbb::concurrent_vector<userInfo> userInfoVector;
-     Ui::Widget *ui;
      std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;
      AnimatedCursor *cursor;
      std::mutex lock_table_form_mux;

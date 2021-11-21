@@ -1,16 +1,12 @@
 #include "form.h"
-#include "ui_form.h"
 
 Form::Form(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Form)
+    QWidget(parent)
 {
-    ui->setupUi(this);
-}
-
-Form::~Form()
-{
-    delete ui;
+    this->stackedWidget = new QStackedWidget();
+    this->layout = new QGridLayout();
+    this->layout->addWidget(this->stackedWidget);
+    this->setLayout(this->layout);
 }
 
 void Form::provideData(std::map<QString, StudioInfo> *studiosStats,
@@ -93,7 +89,6 @@ QChart *Form::CreateChart(QLineSeries *series, const QString &title) noexcept
 void Form::processData() noexcept
 {
     srand(time(0));
-    std::int32_t i = 0, total_episodes = 0;
     this->setWindowTitle(this->nickname);
     this->studios_pie_series  = new QPieSeries();
     this->episodes_pie_series = new QPieSeries();
@@ -127,7 +122,7 @@ void Form::processData() noexcept
     this->insertPage<QChartView, QPieSeries>(this->studios_pie_series);
     this->insertPage<ChartView, QLineSeries>(this->titles_line_series);
     this->insertPage<ChartView, QLineSeries>(this->episodes_line_series);
-    this->ui->stackedWidget->setCurrentIndex(0);
+    this->stackedWidget->setCurrentIndex(0);
 }
 
 template <class T, class U>
@@ -139,6 +134,7 @@ void Form::insertPage(U *series) noexcept
     T *view = new T();
     const QString title = this->nickname + QString(" - ") + QString::number(this->total_titles);
     view->setChart(CreateChart(series, title));
+    view->chart()->zoom(0.9f);
     QVBoxLayout *vlayout = new QVBoxLayout();
     vlayout->addWidget(button_next);
     vlayout->addWidget(button_prev);
@@ -147,22 +143,22 @@ void Form::insertPage(U *series) noexcept
     hlayout->addLayout(vlayout);
     QWidget * widget = new QWidget;
     widget->setLayout(hlayout);
-    this->ui->stackedWidget->insertWidget(0, widget);
+    this->stackedWidget->insertWidget(0, widget);
     ++pages_amount;
 }
 
 void Form::moveToNextPage() noexcept
 {
-    if (this->ui->stackedWidget->currentIndex() == pages_amount - 1)
-        this->ui->stackedWidget->setCurrentIndex(0);
+    if (this->stackedWidget->currentIndex() == pages_amount - 1)
+        this->stackedWidget->setCurrentIndex(0);
     else
-        this->ui->stackedWidget->setCurrentIndex(this->ui->stackedWidget->currentIndex()+1);
+        this->stackedWidget->setCurrentIndex(this->stackedWidget->currentIndex()+1);
 }
 
 void Form::moveToPrevPage() noexcept
 {
-    if (this->ui->stackedWidget->currentIndex() == 0)
-        this->ui->stackedWidget->setCurrentIndex(pages_amount - 1);
+    if (this->stackedWidget->currentIndex() == 0)
+        this->stackedWidget->setCurrentIndex(pages_amount - 1);
     else
-        this->ui->stackedWidget->setCurrentIndex(this->ui->stackedWidget->currentIndex()-1);
+        this->stackedWidget->setCurrentIndex(this->stackedWidget->currentIndex()-1);
 }

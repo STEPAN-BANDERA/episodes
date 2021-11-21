@@ -10,17 +10,14 @@
 #include <map>
 #include <QDateTime>
 #include <QDateTimeAxis>
-#include <QStackedWidget>
 #include <QRectF>
 #include <QRect>
 #include <QLineSeries>
+#include <QStackedWidget>
+#include <QGridLayout>
 #include "DataTypes.h"
 #include "chart.h"
 #include "chartview.h"
-
-namespace Ui {
-class Form;
-}
 
 class Form : public QWidget
 {
@@ -28,7 +25,7 @@ class Form : public QWidget
 
 public:
     explicit Form(QWidget *parent = nullptr);
-    ~Form();
+    ~Form() = default;
     void provideData(
             std::map<QString, StudioInfo> *studiosStats,
             std::map<QString, std::int32_t> *genresStats,
@@ -72,7 +69,8 @@ private:
     std::vector<TitleInfo> *titleInfo;
     QString nickname;
     std::int32_t total_titles = 0, total_episodes = 0, pages_amount = 0;
-    Ui::Form *ui;
+    QGridLayout *layout;
+    QStackedWidget *stackedWidget;
 };
 
 #endif // FORM_H
