@@ -18,6 +18,7 @@ Widget::Widget(QWidget *parent)
     this->pShowChartStudio = new QPushButton("Show Studio Charts");
     this->pShowChartGenre = new QPushButton("Show Genre Charts");
     this->pOpenJsonFile = new QPushButton("Add Data From File");
+    this->pChangeLayoutButton = new QPushButton("Change to Black");
     
 
     this->pHorizontalbxLayout = new QHBoxLayout;
@@ -26,6 +27,7 @@ Widget::Widget(QWidget *parent)
     this->pHorizontalButtonsLayout = new QHBoxLayout;
     this->pHorizontalButtonsLayout ->addWidget(this->pShowChartStudio);
     this->pHorizontalButtonsLayout ->addWidget(this->pShowChartGenre);
+    this->pHorizontalButtonsLayout ->addWidget(this->pChangeLayoutButton);
     this->pVerticallbxLayout = new QVBoxLayout;
 
 
@@ -47,10 +49,13 @@ Widget::Widget(QWidget *parent)
 
     this->setLayout(this->pVerticallbxLayout);
 
+    this->defaultStyleSheet = this->styleSheet();
+
     connect(pcallDialogWindow, SIGNAL (released()),this, SLOT (  GetInput()));
     //connect(pcallOpenLink,     SIGNAL (released()),this, SLOT (on_pushButton_2_clicked()));
     connect(pOpenJsonFile,     SIGNAL (released()),this, SLOT (  OpenFile()));
     connect(pShowChartStudio,  SIGNAL (released()),this, SLOT ( ShowStudioCharts()));
+    connect(pChangeLayoutButton,  SIGNAL (released()),this, SLOT ( ChangeLayout()));
 
     //this->setCursor(QCursor(QPixmap(":/megumin-rotated.png")));
     //cursor = new AnimatedCursor(this, ":/gif/Awch.gif");
@@ -363,6 +368,7 @@ void Widget::ShowStudioCharts() noexcept
 
 }
 
+
 //void Widget::FormLogFiles() noexcept
 //{
 //    this->tp = std::chrono::system_clock::now();
@@ -418,6 +424,23 @@ void Widget::OpenFile()
     }
     
     
+}
+
+void Widget::ChangeLayout() noexcept
+{
+    if(this->defaultStyleSheet == this->styleSheet())
+    {
+        QFile styleSheetFile(":styles/Diffnes.qss");
+        styleSheetFile.open(QFile::ReadOnly);
+        QString styleSheet = QLatin1String(styleSheetFile.readAll());
+        this->setStyleSheet(styleSheet);
+        this->pChangeLayoutButton->setText("Change to White");
+    }
+    else
+    {
+        this->setStyleSheet(this->defaultStyleSheet);
+        this->pChangeLayoutButton->setText("Change to Black");
+    }
 }
 
 //void Widget::SaveFile(  const std::vector<std::pair<QString,std::pair<std::int32_t,std::int32_t>>> * v ,  QString & str ) noexcept

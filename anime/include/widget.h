@@ -42,6 +42,7 @@
 #include "datatypes.h"
 #include "animatedcursor.h"
 #include <QFile>
+
 //#ifndef Q_MOC_RUN
 #define __TBB_NO_IMPLICIT_LINKAGE 1
 #define __TBBMALLOC_NO_IMPLICIT_LINKAGE 1
@@ -63,6 +64,7 @@ private slots:
      void GetInput();
      void OpenFile();
      void ShowStudioCharts() noexcept;
+     void ChangeLayout() noexcept;
      //void on_pushButton_2_clicked();
      
 private:
@@ -71,7 +73,7 @@ private:
      QTableWidget * ptableWidget;
      QComboBox *pidComboBoxList;
      SortComboBox * sortComboBox;
-     QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowChartGenre;
+     QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowChartGenre, *pChangeLayoutButton;
      QHBoxLayout * pHorizontalbxLayout, *pHorizontalButtonsLayout;
      QVBoxLayout * pVerticallbxLayout;
      std::atomic<std::uint32_t> size;
@@ -85,6 +87,7 @@ private:
      std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;
      AnimatedCursor *cursor;
      std::mutex lock_table_form_mux;
+     QString defaultStyleSheet;
 };
 
 
