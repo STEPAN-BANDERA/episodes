@@ -181,8 +181,16 @@ void Widget::do_work(const QString &e) noexcept
             else if (str[pos_start_episodes + 15].isDigit())
                 g.push_back(str[pos_start_episodes + 15]);
         }
-        this->map.insert( this->map.begin(),{e, {sub_str, studio, static_cast<std::int32_t>(g.toInt()), 0, 0, genres}});
-        userIdInfo.titleInfo.push_back({sub_str, studio, static_cast<std::int32_t>(g.toInt()), 0, 0, genres});
+        if (g.toInt() != 801)
+        {
+            this->map.insert( this->map.begin(),{e, {sub_str, studio, static_cast<std::int32_t>(g.toInt()), 0, 0, genres}});
+            userIdInfo.titleInfo.push_back({sub_str, studio, static_cast<std::int32_t>(g.toInt()), 0, 0, genres});
+        }
+        else
+        {
+            this->map.insert( this->map.begin(),{e, {sub_str, studio, static_cast<std::int32_t>(322), 0, 0, genres}});
+            userIdInfo.titleInfo.push_back({sub_str, studio, static_cast<std::int32_t>(322), 0, 0, genres});
+        }
     }
     this->userInfoVector.push_back(userIdInfo);
     this->size++;
