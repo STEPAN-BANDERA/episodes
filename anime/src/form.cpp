@@ -1,4 +1,5 @@
 #include "form.h"
+#include <QDebug>
 
 Form::Form(QWidget *parent) :
     QWidget(parent)
@@ -96,14 +97,17 @@ void Form::processData() noexcept
     this->marks_pie_series = new QPieSeries();
     this->episodes_line_series = this->setupLineSeries(true, Qt::black, "@yPoint", Qt::darkBlue);
     this->titles_line_series = this->setupLineSeries(true, Qt::black, "@yPoint", Qt::red);
-    std::sort(this->date->begin(), this->date->end());
-    for (std::size_t i = 0; i < this->date->size(); i++)
-        this->titles_line_series->append((*this->date)[i].toMSecsSinceEpoch(), i);
-    for (std::size_t i = 0; i < this->titleInfo->size(); i++){
+    for (std::size_t i = 0; i < this->titleInfo->size(); i++)
+        (*this->titleInfo)[i].date = (*this->date)[i];
+    std::sort((*this->titleInfo).begin(), (*this->titleInfo).end());
+    for (std::size_t i = 0; i < this->titleInfo->size(); i++)
+    {
+        this->titles_line_series->append((*this->titleInfo)[i].date.toMSecsSinceEpoch(), i);
         total_episodes += (*this->titleInfo)[i].episodes;
-        this->episodes_line_series->append((*this->date)[i].toMSecsSinceEpoch(), total_episodes);
+        this->episodes_line_series->append((*this->titleInfo)[i].date.toMSecsSinceEpoch(), total_episodes);
     }
-    for (const auto &a : *this->stat){
+    for (const auto &a : *this->stat)
+    {
         std::int32_t r = rand()%255, g = rand()%255, b = rand()%255;
         this->total_titles += a.second.titles;
         this->studios_pie_series ->append(this->setupQPieSlice(a.second.titles,   a.first + QString(" - ") + QString::number(a.second.titles  ), {r,b,g}));
@@ -161,4 +165,9 @@ void Form::moveToPrevPage() noexcept
         this->stackedWidget->setCurrentIndex(pages_amount - 1);
     else
         this->stackedWidget->setCurrentIndex(this->stackedWidget->currentIndex()-1);
+}
+
+bool operator < (const TitleInfo &first , const TitleInfo &second)
+{
+  return first.date.toMSecsSinceEpoch() < second.date.toMSecsSinceEpoch();
 }

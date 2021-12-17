@@ -22,11 +22,11 @@ struct TitleInfo
     std::int32_t episodes;
     std::int32_t position;
     std::int32_t rate;
-    operator QString() const {
-        return title + QString(" ") + QString::number(rate)+ QString(" ") + QString::number(episodes) + QString(" ") + QString::number(position) + QString(" ") + studio;
-    }
     std::vector<QString> genres;
+    QDateTime date;
 };
+
+
 
 struct userInfo
 {
@@ -38,6 +38,7 @@ struct userInfo
     std::int32_t titles_ = 0;
     std::int32_t minuts = 0;
     std::int32_t episode = 0;
+    double averague = 0;
     std::vector<RatingInfo> ratingInfo;
     std::vector<TitleInfo> titleInfo;
     QString nickname;

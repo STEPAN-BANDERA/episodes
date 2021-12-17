@@ -233,6 +233,23 @@ void Widget::GetInput()
     //this->FormLogFiles();
 }
 
+void Widget::AddRowsToTable(const QString &genres, const int &row, const int &current_index, const int &inner_index) noexcept
+{
+    this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index +  1),new QTableWidgetItem(                  userInfoVector[current_index].titleInfo[inner_index].title         ));
+    this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index +  2),new QTableWidgetItem( QString::number( userInfoVector[current_index].ratingInfo[inner_index].total_rating)));
+    if (userInfoVector[current_index].ratingInfo[inner_index].user_rating)
+        this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index + 3),new QTableWidgetItem( QString::number( userInfoVector[current_index].ratingInfo[inner_index].user_rating )));
+    else
+        this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index + 3),new QTableWidgetItem( QString("")));
+    this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index +  4),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes     )));
+    this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index +  5),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes*20  )));
+    this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index +  6),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes/3.  )));
+    this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index +  7),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes/72. )));
+    this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index +  8),new QTableWidgetItem(                  userInfoVector[current_index].titleInfo[inner_index].studio        ));
+    this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index +  9),new QTableWidgetItem(                  genres                                                             ));
+    this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index + 10),new QTableWidgetItem(                  userInfoVector[current_index].date[inner_index].toString(Qt::SystemLocaleShortDate)));
+}
+
 void Widget::FormTable() noexcept
 {
     lock_table_form_mux.lock();
@@ -256,6 +273,16 @@ void Widget::FormTable() noexcept
         userInfoVector[current_index].studiosStats[userInfoVector[current_index].titleInfo[inner_index].studio].episodes += userInfoVector[current_index].titleInfo[inner_index].episodes;
         bool b = 0;
         std::int32_t innerFoundIndex;
+        QString genres;
+        for (const auto &elem: userInfoVector[current_index].titleInfo[inner_index].genres)
+            genres += (elem + ", ");
+        genres.chop(2);
+        double averague = 0;
+        std::int32_t counter = 0;
+        for (std::int32_t index = 0; index < userInfoVector[current_index].ratingInfo.size(); ++index)
+            if (0 != userInfoVector[current_index].ratingInfo[index].user_rating)
+                averague += userInfoVector[current_index].ratingInfo[index].user_rating, ++counter;
+        userInfoVector[current_index].averague = averague / counter;
         for (std::int32_t index_ = 0; index_ < current_index; ++index_ )
         {
             for (std::int32_t inner_index_ = 0; inner_index_ < userInfoVector[index_].titleInfo.size(); ++inner_index_ )
@@ -271,20 +298,9 @@ void Widget::FormTable() noexcept
         skip:
         if(false == b)
         {
-            this->ptableWidget->insertRow(static_cast<int>((userInfoVector[current_index].titleInfo[inner_index].position = this->ptableWidget->rowCount() + 1 ) - 1));
-            this->ptableWidget->setItem  (static_cast<int>(this->ptableWidget->rowCount() - 1), static_cast<int>(COLUMN_COUNT*current_index +  1),new QTableWidgetItem(                  userInfoVector[current_index].titleInfo[inner_index].title         ));
-            this->ptableWidget->setItem  (static_cast<int>(this->ptableWidget->rowCount() - 1), static_cast<int>(COLUMN_COUNT*current_index +  2),new QTableWidgetItem( QString::number( userInfoVector[current_index].ratingInfo[inner_index].total_rating)));
-            if (userInfoVector[current_index].ratingInfo[inner_index].user_rating)
-                this->ptableWidget->setItem  (static_cast<int>(this->ptableWidget->rowCount() - 1), static_cast<int>(COLUMN_COUNT*current_index + 3),new QTableWidgetItem( QString::number( userInfoVector[current_index].ratingInfo[inner_index].user_rating )));
-            else
-                this->ptableWidget->setItem  (static_cast<int>(this->ptableWidget->rowCount() - 1), static_cast<int>(COLUMN_COUNT*current_index + 3),new QTableWidgetItem( QString("")));
-            this->ptableWidget->setItem  (static_cast<int>(this->ptableWidget->rowCount() - 1), static_cast<int>(COLUMN_COUNT*current_index +  4),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes     )));
-            this->ptableWidget->setItem  (static_cast<int>(this->ptableWidget->rowCount() - 1), static_cast<int>(COLUMN_COUNT*current_index +  5),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes*20  )));
-            this->ptableWidget->setItem  (static_cast<int>(this->ptableWidget->rowCount() - 1), static_cast<int>(COLUMN_COUNT*current_index +  6),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes/3.  )));
-            this->ptableWidget->setItem  (static_cast<int>(this->ptableWidget->rowCount() - 1), static_cast<int>(COLUMN_COUNT*current_index +  7),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes/72. )));
-            this->ptableWidget->setItem  (static_cast<int>(this->ptableWidget->rowCount() - 1), static_cast<int>(COLUMN_COUNT*current_index +  8),new QTableWidgetItem(                  userInfoVector[current_index].titleInfo[inner_index].studio        ));
-            this->ptableWidget->setItem  (static_cast<int>(this->ptableWidget->rowCount() - 1), static_cast<int>(COLUMN_COUNT*current_index + 10),new QTableWidgetItem(                  userInfoVector[current_index].date[inner_index].toString(Qt::SystemLocaleShortDate)));
-
+            this->ptableWidget->insertRow(this->ptableWidget->rowCount());
+            userInfoVector[current_index].titleInfo[inner_index].position = this->ptableWidget->rowCount();
+            AddRowsToTable(genres, this->ptableWidget->rowCount() - 1, current_index, inner_index);
             QJsonObject obj;
             obj["title"] = userInfoVector[current_index].titleInfo[inner_index].title;
             obj["episodes"] = QString::number(userInfoVector[current_index].titleInfo[inner_index].episodes);
@@ -293,19 +309,7 @@ void Widget::FormTable() noexcept
         else
         {
             userInfoVector[current_index].titleInfo[inner_index].position = innerFoundIndex;
-            this->ptableWidget->setItem(static_cast<int>(innerFoundIndex - 1), static_cast<int>(COLUMN_COUNT*current_index +  1),new QTableWidgetItem(                  userInfoVector[current_index].titleInfo[inner_index].title         ));
-            this->ptableWidget->setItem(static_cast<int>(innerFoundIndex - 1), static_cast<int>(COLUMN_COUNT*current_index +  2),new QTableWidgetItem( QString::number( userInfoVector[current_index].ratingInfo[inner_index].total_rating)));
-            if (userInfoVector[current_index].ratingInfo[inner_index].user_rating)
-                this->ptableWidget->setItem(static_cast<int>(innerFoundIndex - 1), static_cast<int>(COLUMN_COUNT*current_index + 3),new QTableWidgetItem( QString::number( userInfoVector[current_index].ratingInfo[inner_index].user_rating)));
-            else
-                this->ptableWidget->setItem(static_cast<int>(innerFoundIndex - 1), static_cast<int>(COLUMN_COUNT*current_index + 3),new QTableWidgetItem( QString("")));
-            this->ptableWidget->setItem(static_cast<int>(innerFoundIndex - 1), static_cast<int>(COLUMN_COUNT*current_index +  4),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes     )));
-            this->ptableWidget->setItem(static_cast<int>(innerFoundIndex - 1), static_cast<int>(COLUMN_COUNT*current_index +  5),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes*20  )));
-            this->ptableWidget->setItem(static_cast<int>(innerFoundIndex - 1), static_cast<int>(COLUMN_COUNT*current_index +  6),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes/3.  )));
-            this->ptableWidget->setItem(static_cast<int>(innerFoundIndex - 1), static_cast<int>(COLUMN_COUNT*current_index +  7),new QTableWidgetItem( QString::number( userInfoVector[current_index].titleInfo[inner_index].episodes/72. )));
-            this->ptableWidget->setItem(static_cast<int>(innerFoundIndex - 1), static_cast<int>(COLUMN_COUNT*current_index +  8),new QTableWidgetItem(                  userInfoVector[current_index].titleInfo[inner_index].studio        ));
-            this->ptableWidget->setItem(static_cast<int>(innerFoundIndex - 1), static_cast<int>(COLUMN_COUNT*current_index + 10),new QTableWidgetItem(                  userInfoVector[current_index].date[inner_index].toString(Qt::SystemLocaleShortDate)));
-
+            AddRowsToTable(genres, innerFoundIndex - 1, current_index, inner_index);
             QJsonObject obj;
             obj["title"] = userInfoVector[current_index].titleInfo[inner_index].title;
             obj["episodes"] = QString::number(userInfoVector[current_index].titleInfo[inner_index].episodes);
@@ -334,7 +338,8 @@ void Widget::FormTable() noexcept
             for( const auto & b : a.genres)
                 ++userInfoVector[current_index].genresStats[b];
     this->ptableWidget->insertRow(0);
-    for (std::int32_t var = 0; var < this->userInfoVector.size(); ++var) {
+    for (std::int32_t var = 0; var < this->userInfoVector.size(); ++var)
+    {
         QTableWidgetItem * w = new QTableWidgetItem(this->userInfoVector[var].nickname);
         w->setBackgroundColor(Qt::green);
         w->setIcon(QIcon(":/images/1.ico"));
@@ -342,6 +347,7 @@ void Widget::FormTable() noexcept
         //QTableWidgetItem::setData(Qt::BackgroundRole,QColor(255, 0, 0, 127));
         this->ptableWidget->setItem(1, static_cast<int>(COLUMN_COUNT*var    ),new QTableWidgetItem( this->userInfoVector[var].id  ));
         this->ptableWidget->setItem(0, static_cast<int>(COLUMN_COUNT*var + 1),new QTableWidgetItem( QString("Всего: ") + QString::number(this->userInfoVector[var].titles_)));
+        this->ptableWidget->setItem(0, static_cast<int>(COLUMN_COUNT*var + 3),new QTableWidgetItem( QString("Средняя оценка: ") + QString::number(this->userInfoVector[var].averague)));
         this->ptableWidget->setItem(0, static_cast<int>(COLUMN_COUNT*var + 4),new QTableWidgetItem( QString::number( this->userInfoVector[var].episode    )));
         this->ptableWidget->setItem(0, static_cast<int>(COLUMN_COUNT*var + 5),new QTableWidgetItem( QString::number( this->userInfoVector[var].episode*20 )));
         this->ptableWidget->setItem(0, static_cast<int>(COLUMN_COUNT*var + 6),new QTableWidgetItem( QString::number( this->userInfoVector[var].episode/3. )));
@@ -359,7 +365,6 @@ void Widget::FormTable() noexcept
 
 void Widget::ShowStudioCharts() noexcept
 {
-
     for(auto & e : this->userInfoVector){
 
 
@@ -489,10 +494,6 @@ void Widget::ChangeLayout() noexcept
 //    QDesktopServices::openUrl(QUrl(QString::fromStdString((this->pidComboBoxList->currentText().toStdString()))));
 //}
 
-bool operator < (const TitleInfo &first , const TitleInfo &second)
-{
-  return first.title < second.title;
-}
 
 //QRegularExpression  rgx2("[0-9.]+");
 //    QFile file("out.txt");

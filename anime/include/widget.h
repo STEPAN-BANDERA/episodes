@@ -81,6 +81,7 @@ private:
      QStringList list;
      void do_work(const QString &e) noexcept; 
      void FormTable() noexcept; 
+     void AddRowsToTable(const QString &genres, const int &row, const int &current_index, const int &inner_index) noexcept;
      //void FormLogFiles() noexcept; 
      //void SaveFile( const std::vector<std::pair<QString,std::pair<std::int32_t,std::int32_t>>> * v,  QString & str) noexcept;
      tbb::concurrent_vector<userInfo> userInfoVector;
