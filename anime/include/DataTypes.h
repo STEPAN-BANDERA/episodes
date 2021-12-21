@@ -23,6 +23,7 @@ struct TitleInfo
     std::int32_t position;
     std::int32_t rate;
     std::vector<QString> genres;
+    QString genres_str;
     QDateTime date;
 };
 

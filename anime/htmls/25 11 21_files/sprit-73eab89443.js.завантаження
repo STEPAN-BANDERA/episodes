@@ -1,0 +1,145 @@
+function setCookie(name,value,days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + value + expires + "; path=/";
+}
+
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+
+function delCookie(name) {
+    createCookie(name,"",-1);
+}
+
+var crea = {
+    banner1: {
+        img: '/img/ban1.jpg', //стражи разлома
+        url: 'https://www.creagames.com/ref/673?utm_source=yummyanime&utm_medium=banner'
+    },
+    banner2: {
+        img: '/img/ban2.jpg', //Rise of Angels
+        url: 'http://creagames.com/games/roa?utm_source=yummyanime&utm_medium=banner'
+    }
+};
+
+function espritSetCookie(prev_name, next_name) {
+    setCookie('esprit-prev', prev_name, 1);
+    setCookie('esprit-next', next_name, 1);
+}
+
+function setBanner(href, img) {
+    var topBlock = document.getElementById('crea');
+    if (topBlock) {
+        topBlock.querySelector('a').setAttribute('href', href);
+        topBlock.querySelector('img').setAttribute('src', img);
+    }
+}
+
+// if (getCookie('esprit-prev') != null && getCookie('esprit-next') != null) {
+//     var esprit_prev = getCookie('esprit-prev');
+//     var esprit_next = getCookie('esprit-next');
+//     switch (esprit_prev) {
+//         case 'banner1':
+//             setBanner(crea.banner1.url, crea.banner1.img);
+//             espritSetCookie('banner2', 'banner1');
+//             break;
+//         case 'banner2':
+//             setBanner(crea.banner2.url, crea.banner2.img);
+//             espritSetCookie('banner1', 'banner2');
+//             break;
+//         default:
+//             espritSetCookie('banner1', 'banner2');
+//             break;
+//     }
+// } else {
+//     espritSetCookie('banner1', 'banner2');
+// }
+
+/*esprit*/
+
+var esprit2 = {
+    ban1: {
+        img: '/img/Pokemon_2.jpg',
+        url: 'https://aniga.me/idlepokemon/promo/idl-pok/?esc=yummyanime_pok_940x120_0918'
+    },
+    ban2: {
+        img: '/img/SoulSword_2.jpg',
+        url: 'https://soulsword.ru/?esc=yummyanime_sos_940x120_0918'
+    }
+    // ban3: {
+    //     img: '/img/Atlantida.jpg',
+    //     url: 'https://espritgames.ru/atlantida/promo/atl-wand/?esc=yummyanime_ao_940x120_0118'
+    // },
+    // ban4: {
+    //     img: '/img/Arpiel.jpg',
+    //     url: 'https://espritgames.ru/arpiel/promo/arp-firstlook/?esc=yummyanime_arpiel_940x120_0218'
+    // },
+    // ban5: {
+    //     img: '/img/abyss.jpg',
+    //     url: 'https://espritgames.ru/taleofabyss/?esc=yummyanime_toa_940x120_0818'
+    // },
+    // ban6: {
+    //     img: '/img/soulsword.jpg',
+    //     url: 'https://soulsword.ru/?esc=yummyanime_sos_940x120_0918'
+    // }
+};
+
+function espritSetCookie2(prev_name, next_name) {
+    setCookie('esprit-prev2', prev_name, 1);
+    setCookie('esprit-next2', next_name, 1);
+}
+
+function setSpritBanner(href, img) {
+    var animeTop = document.getElementById('anime_top');
+    if (animeTop) {
+        animeTop.querySelector('a').setAttribute('href', href);
+        animeTop.querySelector('img').setAttribute('src', img);
+    }
+}
+
+if (getCookie('esprit-prev2') != null && getCookie('esprit-next2') != null) {
+    var esprit_prev2 = getCookie('esprit-prev2');
+    var esprit_next2 = getCookie('esprit-next2');
+    switch (esprit_prev2) {
+        case 'ban1':
+            setSpritBanner(esprit2.ban1.url, esprit2.ban1.img);
+            espritSetCookie2('ban2', 'ban1');
+            break;
+        case 'ban2':
+            setSpritBanner(esprit2.ban2.url, esprit2.ban2.img);
+            espritSetCookie2('ban1', 'ban2');
+            break;
+        // case 'ban3':
+        //     setSpritBanner(esprit2.ban3.url, esprit2.ban3.img);
+        //     espritSetCookie2('ban4', 'ban5');
+        //     break;
+        // case 'ban4':
+        //     setSpritBanner(esprit2.ban4.url, esprit2.ban4.img);
+        //     espritSetCookie2('ban5', 'ban6');
+        //     break;
+        // case 'ban5':
+        //     setSpritBanner(esprit2.ban5.url, esprit2.ban5.img);
+        //     espritSetCookie2('ban6', 'ban1');
+        //     break;
+        // case 'ban6':
+        //     setSpritBanner(esprit2.ban6.url, esprit2.ban6.img);
+        //     espritSetCookie2('ban1', 'ban2');
+        default:
+            espritSetCookie2('ban1', 'ban2');
+            break;
+    }
+} else {
+    espritSetCookie2('ban1', 'ban2');
+}

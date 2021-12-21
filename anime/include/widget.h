@@ -69,41 +69,25 @@ private slots:
      
 private:
      tbb::concurrent_map <QString, TitleInfo> map;
-     Form * pForm;
+     Form *pForm;
      QTableWidget * ptableWidget;
      QComboBox *pidComboBoxList;
-     SortComboBox * sortComboBox;
-     QPushButton * pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowChartGenre, *pChangeLayoutButton;
-     QHBoxLayout * pHorizontalbxLayout, *pHorizontalButtonsLayout;
-     QVBoxLayout * pVerticallbxLayout;
-     std::atomic<std::uint32_t> size;
+     SortComboBox *sortComboBox;
+     QPushButton *pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowChartGenre, *pChangeLayoutButton;
+     QHBoxLayout *pHorizontalbxLayout, *pHorizontalButtonsLayout;
+     QVBoxLayout *pVerticallbxLayout;
+     std::atomic <std::uint32_t> size;
      //std::vector<QString> allTitles, allImages;
      QStringList list;
      void do_work(const QString &e) noexcept; 
      void FormTable() noexcept; 
-     void AddRowsToTable(const QString &genres, const int &row, const int &current_index, const int &inner_index) noexcept;
-     //void FormLogFiles() noexcept; 
-     //void SaveFile( const std::vector<std::pair<QString,std::pair<std::int32_t,std::int32_t>>> * v,  QString & str) noexcept;
-     tbb::concurrent_vector<userInfo> userInfoVector;
+     void AddRowsToTable(const QString &genres, const std::int32_t &row, const int &current_index, const int &inner_index) noexcept;
+     //void FormLogFiles(QJsonObject &json, const int &current_index, const std::int32_t &inner_index) noexcept;
+     tbb::concurrent_vector <userInfo> userInfoVector;
      std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;
      AnimatedCursor *cursor;
      std::mutex lock_table_form_mux;
      QString defaultStyleSheet;
 };
 
-
-
 #endif // WIDGET_H
-
-    /*
-     *
-269705
-729512
-430622
-676306
-771703
-486214
-536964
-454905
-701345
-    */

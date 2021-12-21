@@ -1,0 +1,43 @@
+var realTime = {
+    format: null,
+    timezone: null,
+    init: function (timezone, format) {
+        this.format = format;
+        this.timezone = timezone || 0;
+        if (format && Object.keys(format).length > 0) {
+            for (var query in this.format) {
+                if (!document.querySelector(query)) {
+                    return;
+                }
+            }
+            this.tick();
+        }
+    },
+    form: function (i) {
+        return ('0' + i).substr(-2);
+    },
+    tick: function () {
+        var t = this,
+            date = new Date(new Date().getTime() + t.timezone * 3600 * 1000),
+            time = {
+                hh: t.form(date.getUTCHours()),
+                mm: t.form(date.getUTCMinutes()),
+                ss: t.form(date.getUTCSeconds()),
+            };
+
+        for (var query in t.format) {
+            var str = t.format[query],
+                el = document.querySelector(query);
+            for (var key in time) {
+                str = str.replace(key, time[key]);
+            }
+            if (el.innerHTML !== str) {
+                el.innerHTML = str;
+            }
+        }
+
+        setTimeout(function () {
+            t.tick();
+        }, 500);
+    }
+};
