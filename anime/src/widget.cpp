@@ -68,6 +68,11 @@ Widget::~Widget()
 {
 }
 
+//void Widget::GetTitlesIsList(const QString &e)
+//{
+
+//}
+
 void Widget::do_work(const QString &e) noexcept
 {
     qDebug() << QString("thread starts ") << e;
@@ -83,25 +88,32 @@ void Widget::do_work(const QString &e) noexcept
     const std::int32_t pos_start_nickname = str.indexOf("Профиль "), pos_end_nickname = str.indexOf("</title>", pos_start_nickname);
     userIdInfo.nickname = str.mid(pos_start_nickname + 8,pos_end_nickname - pos_start_nickname - 8);
     userIdInfo.id = e;
-    const QRegularExpression rgx("<div class=\"update-list-flex\">[\\x{0000}-\\x{ffff}]{0,1000}<\\/div>[\x20\r\n]+<\\/div>");
+    //const QRegularExpression rgx("<div class=\"update-list-flex\">[\\x{0000}-\\x{ffff}]{0,1000}<\\/div>[\x20\r\n]+<\\/div>");
+    const QRegularExpression rgx("<li class=\"profile-list\" data-typeid=\"[0-9]\"[\\x{0000}-\\x{ffff}]{0,1500}<\\/li>");
     const QRegularExpression rgx2("<i\ class=\"fa\ fa-star\"></i>\ ([0-9.]+)");
     const QRegularExpression rgx3("\/catalog\/item\/([«»—0-9A-Za-z-]+)");
     const QRegularExpression rgx4("<li><a href=\"\/catalog\/category\/[A-Za-z-]+\">([\\x{0000}-\\x{ffff}]{0,40})<\/a><\/li>");
     const QRegularExpression rgx5("data-createdat=\"([0-9]+)\"");
-    QRegularExpressionMatchIterator i5 = rgx5.globalMatch(str);
-    while (i5.hasNext()) {
-        QRegularExpressionMatch match5 = i5.next();
-        if (match5.hasMatch()) {
-            QDateTime timestamp;
-            timestamp.setTime_t(match5.captured(1).toInt());
-            userIdInfo.date.push_back(timestamp);
-        }
-    }
+
     QRegularExpressionMatchIterator i = rgx.globalMatch(str);
     while (i.hasNext()) {
         QRegularExpressionMatch match = i.next();
         if (match.hasMatch()) {
             QString test = match.captured(0);
+            QRegularExpressionMatchIterator i5 = rgx5.globalMatch(test);
+            if (i5.hasNext())
+            {
+                QRegularExpressionMatch match5 = i5.next();
+                QDateTime timestamp;
+                timestamp.setTime_t(match5.captured(1).toInt());
+                userIdInfo.date.push_back(timestamp);
+            }
+            QRegularExpressionMatchIterator i3 = rgx3.globalMatch(test);
+            if (i3.hasNext())
+            {
+                QRegularExpressionMatch match3 = i3.next();
+                vct2.push_back(match3.captured(0));
+            }
             QRegularExpressionMatchIterator i2 = rgx2.globalMatch(test);
             while (i2.hasNext()) {
                 RatingInfo info;
@@ -115,13 +127,6 @@ void Widget::do_work(const QString &e) noexcept
                 }
                 userIdInfo.ratingInfo.push_back(info);
             }
-        }
-    }
-    QRegularExpressionMatchIterator i3 = rgx3.globalMatch(str);
-    while (i3.hasNext()) {
-        QRegularExpressionMatch match3 = i3.next();
-        if (match3.hasMatch()) {
-             vct2.push_back(match3.captured(0));
         }
     }
     for (std::size_t index = 0; index < vct2.size(); ++index){
