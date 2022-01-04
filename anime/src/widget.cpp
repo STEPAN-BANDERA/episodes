@@ -68,25 +68,36 @@ Widget::~Widget()
 {
 }
 
-//void Widget::GetTitlesIsList(const QString &e)
-//{
-
-//}
-
-void Widget::do_work(const QString &e) noexcept
+template <typename T>
+const bool Contains( std::vector<T>& Vec, const T& Element )
 {
-    qDebug() << QString("thread starts ") << e;
-    std::vector<QString> vct2;
-    userInfo userIdInfo;
+    if (std::find(Vec.begin(), Vec.end(), Element) != Vec.end())
+        return true;
+
+    return false;
+}
+
+void Widget::DownloadHtml(const QString page_address, QString &html_code)
+{
     QNetworkAccessManager manager;
-    QNetworkRequest request(QUrl(QString("https://yummyanime.club/users/id") + e + QString("?tab=watched")));
+    QNetworkRequest request{QUrl{page_address}};
     QNetworkReply *reply(manager.get(request));
     QEventLoop loop;
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
-    const QString str = QString(reply->readAll());
-    const std::int32_t pos_start_nickname = str.indexOf("Профиль "), pos_end_nickname = str.indexOf("</title>", pos_start_nickname);
-    userIdInfo.nickname = str.mid(pos_start_nickname + 8,pos_end_nickname - pos_start_nickname - 8);
+    html_code = reply->readAll();
+}
+
+void Widget::do_work(const QString &e) noexcept
+{
+    qDebug() << QString("thread starts ") << e;
+    std::vector<QString> watched_titles, favourite_titles;
+    userInfo userIdInfo;
+    QString tab_watched_html, tab_favourite_html;
+    DownloadHtml(QString("https://yummyanime.club/users/id") + e + QString("?tab=watched"), tab_watched_html);
+    DownloadHtml(QString("https://yummyanime.club/users/id") + e + QString("?tab=favourite"), tab_favourite_html);
+    const std::int32_t pos_start_nickname = tab_watched_html.indexOf("Профиль "), pos_end_nickname = tab_watched_html.indexOf("</title>", pos_start_nickname);
+    userIdInfo.nickname = tab_watched_html.mid(pos_start_nickname + 8,pos_end_nickname - pos_start_nickname - 8);
     userIdInfo.id = e;
     //const QRegularExpression rgx("<div class=\"update-list-flex\">[\\x{0000}-\\x{ffff}]{0,1000}<\\/div>[\x20\r\n]+<\\/div>");
     const QRegularExpression rgx("<li class=\"profile-list\" data-typeid=\"[0-9]\"[\\x{0000}-\\x{ffff}]{0,1500}<\\/li>");
@@ -94,11 +105,12 @@ void Widget::do_work(const QString &e) noexcept
     const QRegularExpression rgx3("\/catalog\/item\/([«»—0-9A-Za-z-]+)");
     const QRegularExpression rgx4("<li><a href=\"\/catalog\/category\/[A-Za-z-]+\">([\\x{0000}-\\x{ffff}]{0,40})<\/a><\/li>");
     const QRegularExpression rgx5("data-createdat=\"([0-9]+)\"");
-
-    QRegularExpressionMatchIterator i = rgx.globalMatch(str);
-    while (i.hasNext()) {
+    QRegularExpressionMatchIterator i = rgx.globalMatch(tab_watched_html);
+    while (i.hasNext())
+    {
         QRegularExpressionMatch match = i.next();
-        if (match.hasMatch()) {
+        if (match.hasMatch())
+        {
             QString test = match.captured(0);
             QRegularExpressionMatchIterator i5 = rgx5.globalMatch(test);
             if (i5.hasNext())
@@ -112,15 +124,17 @@ void Widget::do_work(const QString &e) noexcept
             if (i3.hasNext())
             {
                 QRegularExpressionMatch match3 = i3.next();
-                vct2.push_back(match3.captured(0));
+                watched_titles.push_back(match3.captured(0));
             }
             QRegularExpressionMatchIterator i2 = rgx2.globalMatch(test);
-            while (i2.hasNext()) {
+            while (i2.hasNext())
+            {
                 RatingInfo info;
                 QRegularExpressionMatch match2 = i2.next();
                 if (match2.hasMatch())
                     info.total_rating = match2.captured(1).toFloat();
-                if (i2.hasNext()){
+                if (i2.hasNext())
+                {
                     match2 = i2.next();
                     if (match2.hasMatch())
                         info.user_rating = match2.captured(1).toInt();
@@ -129,72 +143,97 @@ void Widget::do_work(const QString &e) noexcept
             }
         }
     }
-    for (std::size_t index = 0; index < vct2.size(); ++index){
-        const auto &a = this->map.find(vct2[index]);
-        if (this->map.cend() != a){
+
+
+    /////////////////////////////////////////////////////////
+
+    QRegularExpressionMatchIterator i6 = rgx.globalMatch(tab_favourite_html);
+    while (i6.hasNext())
+    {
+        QRegularExpressionMatch match = i6.next();
+        if (match.hasMatch())
+        {
+            QString test = match.captured(0);
+            QRegularExpressionMatchIterator i3 = rgx3.globalMatch(test);
+            if (i3.hasNext())
+            {
+                QRegularExpressionMatch match3 = i3.next();
+                favourite_titles.push_back(match3.captured(0));
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////
+
+    for (std::size_t index = 0; index < watched_titles.size(); ++index){
+        const auto &a = this->map.find(watched_titles[index]);
+        if (this->map.cend() != a)
+        {
             userIdInfo.titleInfo.push_back(a->second);
             continue;
         }
         //            QString image_path = "";
-        //            pos_start = str.find("<img src=\"/img/posters/");
+        //            pos_start = tab_watched_html.find("<img src=\"/img/posters/");
         
-        //            while ( isdigit(str[pos_start + 23]))
+        //            while ( isdigit(tab_watched_html[pos_start + 23]))
         //            {
-        //                image_path += str[pos_start + 23];
+        //                image_path += tab_watched_html[pos_start + 23];
         //                ++pos_start;
         
         //            }
         //            image_path = ("https://yummyanime.club/img/posters/" + image_path + ".jpg");
         //            qDebug() << image_path.c_str();
-
-        QNetworkRequest request(QUrl((QString("https://yummyanime.club") + vct2[index])));
+        QNetworkAccessManager manager;
+        QNetworkRequest request(QUrl((QString("https://yummyanime.club") + watched_titles[index])));
         QNetworkReply *reply(manager.get(request));
         QEventLoop loop;
         QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
         const QByteArray arr = reply->readAll().left(180000);
-        const QString str = QString(arr);
-        const std::int32_t pos_start_title = str.indexOf("<h1>",0);
-        const std::int32_t end_start = str.indexOf("</h1>",pos_start_title + 4);
-        QString sub_str = str.mid(pos_start_title + 4, end_start - pos_start_title - 4).replace("  ", "").remove(0,1);
+        const QString tab_watched_html = QString(arr);
+        const std::int32_t pos_start_title = tab_watched_html.indexOf("<h1>",0);
+        const std::int32_t end_start = tab_watched_html.indexOf("</h1>",pos_start_title + 4);
+        QString sub_str = tab_watched_html.mid(pos_start_title + 4, end_start - pos_start_title - 4).replace("  ", "").remove(0,1);
         sub_str.chop(2);
-        const std::int32_t pos_start_genre = str.indexOf("Жанр:");
+        const std::int32_t pos_start_genre = tab_watched_html.indexOf("Жанр:");
         if (-1 == pos_start_genre) continue;
-        const QStringRef check (&str, pos_start_genre, 2000);
+        const QStringRef check (&tab_watched_html, pos_start_genre, 2000);
         QRegularExpressionMatchIterator i4 = rgx4.globalMatch(check);
         std::vector<QString> genres;
-        while (i4.hasNext()) {
+        while (i4.hasNext())
+        {
             QRegularExpressionMatch match4 = i4.next();
             if (match4.hasMatch())
                 genres.push_back(match4.captured(1));
         }
-        //str.erase(0,pos_start_genre);
-        std::int32_t pos_start_studio = str.indexOf("Студия:");
-        pos_start_studio = str.indexOf("<a href=\"/catalog/studio/", pos_start_studio);
-        const std::int32_t pos_end_studio = str.indexOf("\">", pos_start_studio);
+        //tab_watched_html.erase(0,pos_start_genre);
+        std::int32_t pos_start_studio = tab_watched_html.indexOf("Студия:");
+        pos_start_studio = tab_watched_html.indexOf("<a href=\"/catalog/studio/", pos_start_studio);
+        const std::int32_t pos_end_studio = tab_watched_html.indexOf("\">", pos_start_studio);
         QString studio = "";
         if (-1 != pos_end_studio)
-            studio = str.mid(pos_start_studio + 25, pos_end_studio - pos_start_studio - 25);
-        const std::int32_t pos_start_episodes = str.indexOf("Серии:");
-        QString g (1, str[pos_start_episodes + 14]);
-        if (pos_start_episodes != -1){
-            if (str[pos_start_episodes + 16].isDigit())
+            studio = tab_watched_html.mid(pos_start_studio + 25, pos_end_studio - pos_start_studio - 25);
+        const std::int32_t pos_start_episodes = tab_watched_html.indexOf("Серии:");
+        QString g (1, tab_watched_html[pos_start_episodes + 14]);
+        if (pos_start_episodes != -1)
+        {
+            if (tab_watched_html[pos_start_episodes + 16].isDigit())
             {
-                g.push_back(str[pos_start_episodes + 15]);
-                g.push_back(str[pos_start_episodes + 16]);
+                g.push_back(tab_watched_html[pos_start_episodes + 15]);
+                g.push_back(tab_watched_html[pos_start_episodes + 16]);
             }
-            else if (str[pos_start_episodes + 15].isDigit())
-                g.push_back(str[pos_start_episodes + 15]);
+            else if (tab_watched_html[pos_start_episodes + 15].isDigit())
+                g.push_back(tab_watched_html[pos_start_episodes + 15]);
         }
         if (g.toInt() != 801)
         {
-            this->map.insert( this->map.begin(),{e, {sub_str, studio, static_cast<std::int32_t>(g.toInt()), 0, 0, genres}});
-            userIdInfo.titleInfo.push_back({sub_str, studio, static_cast<std::int32_t>(g.toInt()), 0, 0, genres});
+            this->map.insert( this->map.begin(),{e, {sub_str, studio, static_cast<std::int32_t>(g.toInt()), 0, 0, genres, Contains(favourite_titles, watched_titles[index])}});
+            userIdInfo.titleInfo.push_back({sub_str, studio, static_cast<std::int32_t>(g.toInt()), 0, 0, genres, Contains(favourite_titles, watched_titles[index])});
         }
         else
         {
-            this->map.insert( this->map.begin(),{e, {sub_str, studio, static_cast<std::int32_t>(322), 0, 0, genres}});
-            userIdInfo.titleInfo.push_back({sub_str, studio, static_cast<std::int32_t>(322), 0, 0, genres});
+            this->map.insert( this->map.begin(),{e, {sub_str, studio, static_cast<std::int32_t>(322), 0, 0, genres, Contains(favourite_titles, watched_titles[index])}});
+            userIdInfo.titleInfo.push_back({sub_str, studio, static_cast<std::int32_t>(322), 0, 0, genres, Contains(favourite_titles, watched_titles[index])});
         }
     }
     this->userInfoVector.push_back(userIdInfo);
@@ -221,7 +260,7 @@ void Widget::GetInput()
         else
             this->list.removeAt(static_cast<int>(index--));
     }
-        //std::thread(&Widget::do_work,this,std::ref(str)).detach();
+        //std::thread(&Widget::do_work,this,std::ref(tab_watched_html)).detach();
 //    for(const auto & e : this->list)
 //    {
 //        //this->pidComboBoxList->addItem(QString::fromStdString("https://yummyanime.club/users/id" +e));
@@ -233,14 +272,24 @@ void Widget::GetInput()
 //        [&](std::int32_t index) {
 //           do_work(idVector[index]);
 //        });
-
+//    +        if (regex.exactMatch(this->list.at(static_cast<int>(index))))
+//    +            ++this->size;
+//    +    tbb::parallel_for(static_cast<std::int32_t>(0), this->list.size(),
+//    +        [&](std::int32_t index)
+//    +    {
+//    +        if (regex.exactMatch(this->list.at(static_cast<int>(index))))
+//    +            do_work(this->list.at(static_cast<int>(index)));
+//    +    });
     //while (this->size.load() != this->list.size()) std::this_thread::yield();
     //this->FormLogFiles();
 }
 
 void Widget::AddRowsToTable(const QString &genres, const std::int32_t &row, const std::int32_t &current_index, const int &inner_index) noexcept
 {
-    this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index +  1),new QTableWidgetItem(                  userInfoVector[current_index].titleInfo[inner_index].title         ));
+    auto item = new QTableWidgetItem(                  userInfoVector[current_index].titleInfo[inner_index].title         );
+    if (userInfoVector[current_index].titleInfo[inner_index].is_favourite)
+        item->setIcon(QIcon(":/images/2.ico"));
+    this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index +  1), item);
     this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index +  2),new QTableWidgetItem( QString::number( userInfoVector[current_index].ratingInfo[inner_index].total_rating)));
     if (userInfoVector[current_index].ratingInfo[inner_index].user_rating)
         this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index + 3),new QTableWidgetItem( QString::number( userInfoVector[current_index].ratingInfo[inner_index].user_rating )));
@@ -472,4 +521,4 @@ void Widget::ChangeLayout() noexcept
 //        return;
 
 //    QTextStream out(&file);
-//    out << str;
+//    out << tab_watched_html;

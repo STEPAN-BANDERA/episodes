@@ -82,6 +82,7 @@ private:
      void do_work(const QString &e) noexcept; 
      void FormTable() noexcept; 
      void AddRowsToTable(const QString &genres, const std::int32_t &row, const int &current_index, const int &inner_index) noexcept;
+     void DownloadHtml(const QString page_address, QString &html_code);
      //void FormLogFiles(QJsonObject &json, const int &current_index, const std::int32_t &inner_index) noexcept;
      tbb::concurrent_vector <userInfo> userInfoVector;
      std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;

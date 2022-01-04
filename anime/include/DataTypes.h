@@ -10,7 +10,8 @@ struct StudioInfo
     std::int32_t titles = 0;
     std::int32_t episodes = 0;
 };
-struct RatingInfo{
+struct RatingInfo
+{
     float total_rating = 0.;
     std::int32_t user_rating = 0;
 };
@@ -23,6 +24,7 @@ struct TitleInfo
     std::int32_t position;
     std::int32_t rate;
     std::vector<QString> genres;
+    bool is_favourite;
     QString genres_str;
     QDateTime date;
 };
