@@ -46,7 +46,7 @@
 //#ifndef Q_MOC_RUN
 #define __TBB_NO_IMPLICIT_LINKAGE 1
 #define __TBBMALLOC_NO_IMPLICIT_LINKAGE 1
-#include "oneapi\tbb.h"
+#include "oneapi/tbb.h"
 #include "tbb/concurrent_hash_map.h"
 #include "tbb/blocked_range.h"
 #include "tbb/parallel_for.h"

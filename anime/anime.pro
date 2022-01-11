@@ -4,9 +4,11 @@ CONFIG += c++17
 
 TEMPLATE = app
 DESTDIR  = "$$_PRO_FILE_PWD_"/build_dir
-INCLUDEPATH += "$$_PRO_FILE_PWD_"/oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/include "$$_PRO_FILE_PWD_"/include/
+INCLUDEPATH += "$$_PRO_FILE_PWD_"/oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/include "$$_PRO_FILE_PWD_"/oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/include "$$_PRO_FILE_PWD_"/include/
 
-LIBS += -L"$$_PRO_FILE_PWD_"/oneapi-tbb-2021.3.0-win -ltbb
+LIBS += -L"$$_PRO_FILE_PWD_"/oneapi-tbb-2021.3.0-win
+LIBS += -L"$$_PRO_FILE_PWD_"/oneapi-tbb-2021.5.0-lin
+LIBS += -ltbb
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -317,7 +319,79 @@ DISTFILES += \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/redist/intel64/vc14_uwp/tbbmalloc_proxy.pdb \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/redist/intel64/vc14_uwp/tbbmalloc_proxy_debug.dll \
     oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/redist/intel64/vc14_uwp/tbbmalloc_proxy_debug.pdb \
-    oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/third-party-programs.txt
+    oneapi-tbb-2021.3.0-win/oneapi-tbb-2021.3.0/third-party-programs.txt \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_debug.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_0_debug.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_0_debug.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_0_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_debug.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc_debug.so.2.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc_debug.so.2 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc_proxy_debug.so.2.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc_proxy_debug.so.2 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc_proxy_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb.so.12.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb.so.12 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_0.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_5.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_5.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc.so.2 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc.so.2.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_0.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc_proxy.so.2 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_5.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_5_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_5_debug.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb_debug.so.12 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_5_debug.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc_proxy.so.2.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc_proxy.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind_2_0.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbbind.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb_debug.so.12.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_debug.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_0_debug.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_0_debug.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_0_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_debug.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc_debug.so.2.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc_debug.so.2 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc_proxy_debug.so.2.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc_proxy_debug.so.2 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc_proxy_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbb.so.12.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbb.so.12 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbb.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_0.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_5.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_5.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc.so.2 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbb_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc.so.2.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_0.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc_proxy.so.2 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_5.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_5_debug.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_5_debug.so.3 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbb_debug.so.12 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_5_debug.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc_proxy.so.2.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbmalloc_proxy.so \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind_2_0.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbbbind.so.3.5 \
+    oneapi-tbb-2021.5.0-lin/oneapi-tbb-2021.5.0/lib/ia32/gcc4.8/libtbb_debug.so.12.5
 
 RESOURCES += \
     rc.qrc
