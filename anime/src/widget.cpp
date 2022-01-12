@@ -19,21 +19,25 @@ Widget::Widget(QWidget *parent)
     this->pShowChartGenre = new QPushButton("Show Genre Charts");
     this->pOpenJsonFile = new QPushButton("Add Data From File");
     this->pChangeLayoutButton = new QPushButton("Change to Black");
-    
+    this->pProgressBar = new QProgressBar();
+    this->pProgressBar->setMinimum(0);
 
-    this->pHorizontalbxLayout = new QHBoxLayout;
+
+    this->pVerticallbxLayout = new QVBoxLayout;
+
+    this->pHorizontalProgresBarLayout = new QHBoxLayout;
+    this->pHorizontalProgresBarLayout ->addWidget(this->pProgressBar);
 
 
     this->pHorizontalButtonsLayout = new QHBoxLayout;
     this->pHorizontalButtonsLayout ->addWidget(this->pShowChartStudio);
     this->pHorizontalButtonsLayout ->addWidget(this->pShowChartGenre);
     this->pHorizontalButtonsLayout ->addWidget(this->pChangeLayoutButton);
-    this->pVerticallbxLayout = new QVBoxLayout;
 
 
 
+    this->pHorizontalbxLayout = new QHBoxLayout;
     this->pHorizontalbxLayout->addWidget(this->sortComboBox, 3);
-
     this->pHorizontalbxLayout->addWidget(this->pidComboBoxList, 3);
     this->pHorizontalbxLayout->addWidget(this->pcallOpenLink, 2);
     this->pHorizontalbxLayout->addWidget(this->pcallDialogWindow, 2);
@@ -42,7 +46,7 @@ Widget::Widget(QWidget *parent)
     this->pVerticallbxLayout ->addWidget(this->ptableWidget);
 
 
-
+    this->pVerticallbxLayout ->addLayout(this->pHorizontalProgresBarLayout);
     this->pVerticallbxLayout ->addLayout(this->pHorizontalButtonsLayout);
     this->pVerticallbxLayout ->addLayout(this->pHorizontalbxLayout); 
     this->setWindowTitle("Check profile");
@@ -56,6 +60,7 @@ Widget::Widget(QWidget *parent)
     connect(pOpenJsonFile,     SIGNAL (released()),this, SLOT (  OpenFile()));
     connect(pShowChartStudio,  SIGNAL (released()),this, SLOT ( ShowStudioCharts()));
     connect(pChangeLayoutButton,  SIGNAL (released()),this, SLOT ( ChangeLayout()));
+    connect(pProgressBar,  SIGNAL (&pProgressBar::valueChanged()),this, SLOT ( valueChanged(int)));
 
     //this->setCursor(QCursor(QPixmap(":/megumin-rotated.png")));
     //cursor = new AnimatedCursor(this, ":/gif/Awch.gif");
@@ -244,6 +249,7 @@ void Widget::do_work(const QString &e) noexcept
 
 void Widget::GetInput()
 {
+    this->pProgressBar->setValue(0);
     QRegExp regex("[0-9]+");
     Dialog d(this);
     if (d.exec() == QDialog::Rejected) return;
@@ -260,6 +266,7 @@ void Widget::GetInput()
         else
             this->list.removeAt(static_cast<int>(index--));
     }
+    this->pProgressBar->setMaximum(this->list.size());
         //std::thread(&Widget::do_work,this,std::ref(tab_watched_html)).detach();
 //    for(const auto & e : this->list)
 //    {
@@ -309,7 +316,7 @@ void Widget::FormTable() noexcept
     lock_table_form_mux.lock();
     static std::int32_t current_index = -1;
     ++current_index;
-    if(current_index == 0){
+    if (current_index == 0){
         QStringList lst;
         for(std::int32_t current_index = 0; current_index < this->list.size(); ++ current_index)
             lst << QString::number(current_index)
@@ -349,7 +356,7 @@ void Widget::FormTable() noexcept
             }
         }
         skip:
-        if(false == b)
+        if (false == b)
         {
             this->ptableWidget->insertRow(this->ptableWidget->rowCount());
             userInfoVector[current_index].titleInfo[inner_index].position = this->ptableWidget->rowCount();
@@ -382,7 +389,9 @@ void Widget::FormTable() noexcept
     }
     else qDebug() << "Cannot open file";
     userInfoVector[current_index].titles_ = static_cast<std::int32_t>(userInfoVector[current_index].titleInfo.size());
-    if(current_index != this->list.size()-1){
+    emit this->pProgressBar->valueChanged(this->pProgressBar->value() + 1);
+    if (current_index != this->list.size()-1)
+    {
         lock_table_form_mux.unlock();
         return;
     }
@@ -412,7 +421,6 @@ void Widget::FormTable() noexcept
     this->tp2 = std::chrono::system_clock::now();
     const std::chrono::duration<double> diff = tp2 - tp;
     qDebug() << diff.count();
-
     lock_table_form_mux.unlock();
 }
 

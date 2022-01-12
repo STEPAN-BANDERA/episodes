@@ -59,6 +59,10 @@ class Widget : public QWidget
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
+public slots:
+    void valueChanged(int newValue){
+        this->pProgressBar->setValue(newValue);
+    }
 
 private slots:
      void GetInput();
@@ -74,8 +78,9 @@ private:
      QComboBox *pidComboBoxList;
      SortComboBox *sortComboBox;
      QPushButton *pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowChartGenre, *pChangeLayoutButton;
-     QHBoxLayout *pHorizontalbxLayout, *pHorizontalButtonsLayout;
+     QHBoxLayout *pHorizontalbxLayout, *pHorizontalButtonsLayout, *pHorizontalProgresBarLayout;
      QVBoxLayout *pVerticallbxLayout;
+     QProgressBar *pProgressBar;
      std::atomic <std::uint32_t> size;
      //std::vector<QString> allTitles, allImages;
      QStringList list;
