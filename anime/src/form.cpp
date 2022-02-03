@@ -110,8 +110,8 @@ void Form::processData() noexcept
     {
         std::int32_t r = rand()%255, g = rand()%255, b = rand()%255;
         this->total_titles += a.second.titles;
-        this->studios_pie_series ->append(this->setupQPieSlice(a.second.titles,   a.first + QString(" - ") + QString::number(a.second.titles  ), {r,b,g}));
-        this->episodes_pie_series->append(this->setupQPieSlice(a.second.episodes, a.first + QString(" - ") + QString::number(a.second.episodes), {r,b,g}));
+        this->studios_pie_series ->append(this->setupQPieSlice(a.second.titles,   a.first + QString(" - ") + QString::number(a.second.titles  ), {r,g,b}));
+        this->episodes_pie_series->append(this->setupQPieSlice(a.second.episodes, a.first + QString(" - ") + QString::number(a.second.episodes), {r,g,b}));
        }
     for (const auto &a : *this->genresStats)
         this->genres_pie_series->append(this->setupQPieSlice(a.second, a.first + QString(" - ") + QString::number(a.second)));

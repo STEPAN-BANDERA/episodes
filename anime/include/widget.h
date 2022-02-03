@@ -65,15 +65,16 @@ private slots:
      void OpenFile();
      void ShowStudioCharts() noexcept;
      void ChangeLayout() noexcept;
+     void ShowMinCompare() noexcept;
      //void on_pushButton_2_clicked();
      
 private:
      tbb::concurrent_map <QString, TitleInfo> map;
      Form *pForm;
-     QTableWidget * ptableWidget;
+     QTableWidget * ptableWidget, * pcompareWidget;
      QComboBox *pidComboBoxList;
      SortComboBox *sortComboBox;
-     QPushButton *pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowChartGenre, *pChangeLayoutButton;
+     QPushButton *pcallDialogWindow, *pcallOpenLink, *pOpenJsonFile, *pShowChartStudio, *pShowMinCompare, *pChangeLayoutButton;
      QHBoxLayout *pHorizontalbxLayout, *pHorizontalButtonsLayout;
      QVBoxLayout *pVerticallbxLayout;
      std::atomic <std::uint32_t> size;
@@ -82,13 +83,16 @@ private:
      void do_work(const QString &e) noexcept; 
      void FormTable() noexcept; 
      void AddRowsToTable(const QString &genres, const std::int32_t &row, const int &current_index, const int &inner_index) noexcept;
+     void AddRowsToMinTable(const std::int32_t &row, const std::int32_t &col, const bool &new_title_flag, const std::int32_t &current_index, const int &inner_index) noexcept;
      void DownloadHtml(const QString page_address, QString &html_code);
+
      //void FormLogFiles(QJsonObject &json, const int &current_index, const std::int32_t &inner_index) noexcept;
      tbb::concurrent_vector <userInfo> userInfoVector;
      std::chrono::time_point <std::chrono::system_clock,std::chrono::duration<double>> tp,tp2;
      AnimatedCursor *cursor;
      std::mutex lock_table_form_mux;
      QString defaultStyleSheet;
+     QStackedWidget* pStackedWidget;
 };
 
 #endif // WIDGET_H

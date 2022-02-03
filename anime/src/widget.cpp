@@ -16,20 +16,18 @@ Widget::Widget(QWidget *parent)
     this->pcallOpenLink  = new QPushButton("Open choosed profile");
     this->pcallDialogWindow = new QPushButton("Gеt input ids");
     this->pShowChartStudio = new QPushButton("Show Studio Charts");
-    this->pShowChartGenre = new QPushButton("Show Genre Charts");
+    this->pShowMinCompare = new QPushButton("Show Min Compare");
     this->pOpenJsonFile = new QPushButton("Add Data From File");
     this->pChangeLayoutButton = new QPushButton("Change to Black");
     
 
     this->pHorizontalbxLayout = new QHBoxLayout;
 
-
     this->pHorizontalButtonsLayout = new QHBoxLayout;
     this->pHorizontalButtonsLayout ->addWidget(this->pShowChartStudio);
-    this->pHorizontalButtonsLayout ->addWidget(this->pShowChartGenre);
+    this->pHorizontalButtonsLayout ->addWidget(this->pShowMinCompare);
     this->pHorizontalButtonsLayout ->addWidget(this->pChangeLayoutButton);
     this->pVerticallbxLayout = new QVBoxLayout;
-
 
 
     this->pHorizontalbxLayout->addWidget(this->sortComboBox, 3);
@@ -39,8 +37,13 @@ Widget::Widget(QWidget *parent)
     this->pHorizontalbxLayout->addWidget(this->pcallDialogWindow, 2);
     this->pHorizontalbxLayout->addWidget(this->pOpenJsonFile, 2);
 
-    this->pVerticallbxLayout ->addWidget(this->ptableWidget);
+    this->pcompareWidget = new QTableWidget;
 
+    this->pStackedWidget = new QStackedWidget;
+
+    this->pStackedWidget ->addWidget(this->ptableWidget);
+    this->pStackedWidget ->addWidget(this->pcompareWidget);
+    this->pVerticallbxLayout ->addWidget(this->pStackedWidget);
 
 
     this->pVerticallbxLayout ->addLayout(this->pHorizontalButtonsLayout);
@@ -56,7 +59,7 @@ Widget::Widget(QWidget *parent)
     connect(pOpenJsonFile,     SIGNAL (released()),this, SLOT (  OpenFile()));
     connect(pShowChartStudio,  SIGNAL (released()),this, SLOT ( ShowStudioCharts()));
     connect(pChangeLayoutButton,  SIGNAL (released()),this, SLOT ( ChangeLayout()));
-
+    connect(pShowMinCompare,  SIGNAL (released()),this, SLOT ( ShowMinCompare()));
     //this->setCursor(QCursor(QPixmap(":/megumin-rotated.png")));
     //cursor = new AnimatedCursor(this, ":/gif/Awch.gif");
     std::atomic_init(&size, static_cast<std::uint32_t>(0));
@@ -304,6 +307,24 @@ void Widget::AddRowsToTable(const QString &genres, const std::int32_t &row, cons
     this->ptableWidget->setItem  (row, static_cast<int>(COLUMN_COUNT*current_index + 10),new QTableWidgetItem(                  userInfoVector[current_index].date[inner_index].toString(Qt::SystemLocaleShortDate)));
 }
 
+void Widget::AddRowsToMinTable(const std::int32_t &row, const std::int32_t &col, const bool &new_title_flag, const std::int32_t &current_index, const int &inner_index) noexcept
+{
+    if (!new_title_flag){
+        this->pcompareWidget->setItem (row, 0,new QTableWidgetItem( userInfoVector[current_index].titleInfo[inner_index].title ));
+    }
+    auto item = new QTableWidgetItem( QString::number( userInfoVector[current_index].ratingInfo[inner_index].user_rating ));
+    if (userInfoVector[current_index].titleInfo[inner_index].is_favourite)
+        item->setIcon(QIcon(":/images/2.ico"));
+    if (userInfoVector[current_index].ratingInfo[inner_index].user_rating)
+        this->pcompareWidget->setItem  (row, col + 1, item);
+    else
+    {
+        auto item = new QTableWidgetItem(QString(""));
+        item->setBackgroundColor(QColor(240, 240, 240, 240));
+        this->pcompareWidget->setItem  (row, col + 1,item);
+    }
+}
+
 void Widget::FormTable() noexcept
 {
     lock_table_form_mux.lock();
@@ -318,6 +339,7 @@ void Widget::FormTable() noexcept
                 << QString("время в сутках") << QString("студия")         << QString("жанры")
                 << QString("дата добавления")<< QString("");
         this->ptableWidget->setColumnCount(static_cast<int>(this->list.size()*COLUMN_COUNT));
+        this->pcompareWidget->setColumnCount(this->list.size()+1);
         this->ptableWidget->setHorizontalHeaderLabels(lst);
     }
     QJsonArray json_array;
@@ -352,13 +374,16 @@ void Widget::FormTable() noexcept
         if(false == b)
         {
             this->ptableWidget->insertRow(this->ptableWidget->rowCount());
+            this->pcompareWidget->insertRow(this->pcompareWidget->rowCount());
             userInfoVector[current_index].titleInfo[inner_index].position = this->ptableWidget->rowCount();
             AddRowsToTable(userInfoVector[current_index].titleInfo[inner_index].genres_str, this->ptableWidget->rowCount() - 1, current_index, inner_index);
+            AddRowsToMinTable(this->pcompareWidget->rowCount() - 1, current_index, b, current_index, inner_index);
         }
         else
         {
             userInfoVector[current_index].titleInfo[inner_index].position = innerFoundIndex;
             AddRowsToTable(userInfoVector[current_index].titleInfo[inner_index].genres_str, innerFoundIndex - 1, current_index, inner_index);
+            AddRowsToMinTable(innerFoundIndex - 1, current_index, b, current_index, inner_index);
         }
         QJsonObject obj;
         obj["title"] = userInfoVector[current_index].titleInfo[inner_index].title;
@@ -391,13 +416,13 @@ void Widget::FormTable() noexcept
             for( const auto & b : a.genres)
                 ++userInfoVector[current_index].genresStats[b];
     this->ptableWidget->insertRow(0);
+    this->pcompareWidget->insertRow(0);
     for (std::int32_t var = 0; var < this->userInfoVector.size(); ++var)
     {
         QTableWidgetItem * w = new QTableWidgetItem(this->userInfoVector[var].nickname);
         w->setBackgroundColor(Qt::green);
         w->setIcon(QIcon(":/images/1.ico"));
         this->ptableWidget->setItem(0, static_cast<int>(COLUMN_COUNT*var    ),w );
-        //QTableWidgetItem::setData(Qt::BackgroundRole,QColor(255, 0, 0, 127));
         this->ptableWidget->setItem(1, static_cast<int>(COLUMN_COUNT*var    ),new QTableWidgetItem( this->userInfoVector[var].id  ));
         this->ptableWidget->setItem(0, static_cast<int>(COLUMN_COUNT*var + 1),new QTableWidgetItem( QString("Всего: ") + QString::number(this->userInfoVector[var].titles_)));
         this->ptableWidget->setItem(0, static_cast<int>(COLUMN_COUNT*var + 3),new QTableWidgetItem( QString("Средняя оценка: ") + QString::number(this->userInfoVector[var].averague)));
@@ -406,6 +431,11 @@ void Widget::FormTable() noexcept
         this->ptableWidget->setItem(0, static_cast<int>(COLUMN_COUNT*var + 6),new QTableWidgetItem( QString::number( this->userInfoVector[var].episode/3. )));
         this->ptableWidget->setItem(0, static_cast<int>(COLUMN_COUNT*var + 7),new QTableWidgetItem( QString::number( this->userInfoVector[var].episode/72.)));
     }
+    QStringList lstz;
+    lstz << QString("тайтл");
+    for(const auto & a:this->userInfoVector)
+        lstz << a.nickname;
+    this->pcompareWidget->setHorizontalHeaderLabels(lstz);
     //this->allTitles.erase(std::unique(this->allTitles.begin(),this->allTitles.end()),this->allTitles.end());
     //for (const auto & e : this->idVector) this->sortComboBox->addItem(QString::fromStdString( ("https://yummyanime.club/users/id" + e)  ));
 
@@ -507,6 +537,14 @@ void Widget::ChangeLayout() noexcept
         this->setStyleSheet(this->defaultStyleSheet);
         this->pChangeLayoutButton->setText("Change to Black");
     }
+}
+
+void Widget::ShowMinCompare() noexcept
+{
+    if (this->pStackedWidget->currentIndex() == 1)
+        this->pStackedWidget->setCurrentIndex(0);
+    else
+        this->pStackedWidget->setCurrentIndex(this->pStackedWidget->currentIndex()+1);
 }
 
 //void Widget::on_pushButton_2_clicked()
